@@ -31,36 +31,36 @@ b e e b b b e b
 `
     //% blockIdentity=images._tile
     export const tile3 = img`
-b e d 4 4 4 4 4 
-b e d 4 4 4 4 4 
-b e d 4 4 4 4 4 
-b e d 4 4 4 4 4 
-b e d 4 4 4 4 4 
-b e d 4 4 4 4 4 
-b e d 4 4 4 4 4 
-b e d 4 4 4 4 4 
+b e d 8 8 8 8 8 
+b e d 8 8 8 8 8 
+b e d 8 8 8 8 8 
+b e d 8 8 8 8 8 
+b e d 8 8 8 8 8 
+b e d 8 8 8 8 8 
+b e d 8 8 8 8 8 
+b e d 8 8 8 8 8 
 `
     //% blockIdentity=images._tile
     export const tile4 = img`
-5 5 5 5 5 5 5 5 
-5 5 5 5 5 5 5 5 
-5 5 5 5 5 5 5 5 
-5 5 5 5 5 5 5 5 
-5 5 5 5 5 5 5 5 
-5 5 5 5 5 5 5 5 
-5 5 5 5 5 5 5 5 
-5 5 5 5 5 5 5 5 
+7 7 7 7 7 7 7 7 
+7 7 7 7 7 7 7 7 
+7 7 7 7 7 7 7 7 
+7 7 7 7 7 7 7 7 
+7 7 7 7 7 7 7 7 
+7 7 7 7 7 7 7 7 
+7 7 7 7 7 7 7 7 
+7 7 7 7 7 7 7 7 
 `
     //% blockIdentity=images._tile
     export const tile5 = img`
-4 4 4 4 4 d e b 
-4 4 4 4 4 d e b 
-4 4 4 4 4 d e b 
-4 4 4 4 4 d e b 
-4 4 4 4 4 d e b 
-4 4 4 4 4 d e b 
-4 4 4 4 4 d e b 
-4 4 4 4 4 d e b 
+8 8 8 8 8 d e b 
+8 8 8 8 8 d e b 
+8 8 8 8 8 d e b 
+8 8 8 8 8 d e b 
+8 8 8 8 8 d e b 
+8 8 8 8 8 d e b 
+8 8 8 8 8 d e b 
+8 8 8 8 8 d e b 
 `
 }
 let mySprite = sprites.create(img`
@@ -74,22 +74,38 @@ let mySprite = sprites.create(img`
 . . . . . . . . 
 `, SpriteKind.Player)
 let octopus = sprites.create(img`
-. d . . . d d d . . . . d d . . 
-d . . d d . . . . . . d . . d . 
-d . d . . . . . . . d . . . . d 
-d . d . . . . . . . d . . . . . 
-d . . d d . 8 8 8 8 . . . d d . 
-. d . . . 8 d d d d d . d . . d 
-. . d d 8 d d d d d d d . . . d 
-. . . . d d d d d d d d . . . d 
-. . . . d d d d d d d d . . d . 
-. . . d d d d d d d d 1 . . d . 
-. d d . . d d d d 1 1 . d . . . 
-d . . . . d . 1 1 . d . . d . . 
-d . . . d . . . . . d . . . d . 
-d . . . d . . . . . . d . . . d 
-. d d . d . . . d . . d . . . d 
-. . . . . d d . . d d . . . d . 
+. d d d d . . . . . . . d d d d d d . . . . . . . . . d d d . . 
+d d d . . . . . . . . d d d d d d d d d . . . . . d d d d d d . 
+d d . . . . . . . . d d d d . . . . . d d . . . . d d . . . d d 
+d d . . . . . . . . d d d . . . . . . . . . . . d d d . . . d d 
+d d . d . . . . . . d d d . . . . . . . . . . d d d d . . . . d 
+d d d . . . . . . . d d d d . . . . . . . . d d d d d . . . . . 
+d d d d . . . . . . d d d 8 8 8 8 8 d d . . d d d d . . . . . . 
+. d d d d . . . . . . 8 8 d d d d d d d d d d d d . . . . . . . 
+. . d d d d d d d . 8 d d d d d d d d d d d d d d . . . . . . . 
+. . . d d d d d d 8 d d d d d d d d d d d d d d . . . . . . . . 
+. . . . . d d d d 8 d d d d d d d d d d d d d d . . . . . d d . 
+. . . . . . d d 8 d d d d d d d d d d d d d d d d . d d d d d d 
+. . . . . . . . 8 d d d d d d d d d d d d d d d d d d d d d d d 
+. . . . . . . . d d d d d d d d d d d d d d d d d d d d d . d d 
+. . . . . . . . d d d d d d d d d d d d d d d d d d d . . . d d 
+. . . . . . . . d d d d d d d d d d d d d d d d d . . . . . . d 
+. . . . . . . d d d d d d d d d d d d d d d d d 1 . . . . d d d 
+. . . . . . d d d d d d d d d d d d d d d d d d 1 . . . . d d . 
+. . . . d d d d d d d d d d d d d d d d d d d 1 d . . . . d . . 
+. . d d d d d d d d d d d d d d d d d d d d d 1 d d d . . . . . 
+. d d d d d d d d d d d d d d d d d d d d d d d d d d . . . . . 
+d d d d d . . . . . d d d d d d d d d d 1 1 . d d d d d . . . . 
+d d d d . . . . . d d d d d d d d 1 1 1 d d . . . d d d d . . . 
+d d d . . . . . . d d d d d . . . d d d d d . . . d d d d . . . 
+d d d . . . . . . d d d . . . . . . d d d d . . . . . d d d . . 
+d d d . . . . . . d d d . . . . . . . d d d d . . . . d d d . . 
+d d d . . . . . d d d . . . . . . . . . d d d . . . . d d d d . 
+d d . . . . . . d d d . . . . . . . . . d d d . . . . . d d d . 
+d d . . . . . . d d d . . . . . . . . . . d d d . . . . . d d d 
+d d . . . . . . d d d . . . . . . . . d . . d d . . . . . . d d 
+d d d . . . . . . d d . . . . . . . . d d d d d . . . . . . d d 
+. d d . . . . . . . d d d . . . . . . . d d d . . . . . . d . . 
 `, SpriteKind.Enemy)
 let shark = sprites.create(img`
 . . . . 8 d d . 
@@ -102,14 +118,14 @@ let shark = sprites.create(img`
 . 7 7 7 7 7 7 . 
 `, SpriteKind.Enemy)
 let coin = sprites.create(img`
-. . . 9 9 . . . 
-. 9 9 2 2 9 9 . 
-9 2 2 9 9 2 2 9 
-. 9 2 2 2 2 9 . 
-. 9 2 2 2 2 9 . 
-. . 9 2 2 9 . . 
-. . 9 2 2 9 . . 
-. . . 9 9 . . . 
+. . 4 4 4 4 . . 
+. 4 5 5 5 5 4 . 
+4 5 5 4 5 5 5 4 
+4 5 5 4 5 5 5 4 
+4 5 5 4 5 5 5 4 
+4 5 5 4 5 5 5 4 
+. 4 5 5 5 5 4 . 
+. . 4 4 4 4 . . 
 `, SpriteKind.Food)
 controller.moveSprite(mySprite)
 tiles.setTilemap(tiles.createTilemap(
