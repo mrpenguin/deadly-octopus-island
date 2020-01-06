@@ -289,9 +289,10 @@ tiles.setTilemap(tiles.createTilemap(
             [myTiles.tile0,myTiles.tile2,myTiles.tile3,myTiles.tile4,myTiles.tile5,myTiles.tile6,myTiles.tile7,myTiles.tile8,myTiles.tile9,myTiles.tile10,myTiles.tile11,myTiles.tile12,myTiles.tile13,myTiles.tile14,myTiles.tile15,myTiles.tile16],
             TileScale.Eight
         ))
-let coinTiles = tiles.getTilesByType(myTiles.tile4)
+let coinTiles = tiles.getTilesByType(myTiles.tile6)
 coinTiles.forEach(function (value: tiles.Location, index: number) {
-
-    tiles.placeOnTile(new Sprite(coin.image), value);
+    let newCoin = new Sprite(coin.image)
+    
+    tiles.placeOnTile(newCoin, value)
     //tiles.setTileAt(value, myTiles.tile2);
 })
