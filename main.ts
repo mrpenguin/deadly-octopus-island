@@ -299,3 +299,11 @@ coinTiles.forEach(function (value: tiles.Location, index: number) {
     tiles.placeOnTile(newCoin, value)
     tiles.setTileAt(value, myTiles.tile4);
 })
+
+game.onUpdate(function () {
+	tiles.getTileAt(positionToTile(mySprite.x), positionToTile(mySprite.y))
+})
+
+function positionToTile(position:number):number{
+    return Math.floor(position/8);
+}
