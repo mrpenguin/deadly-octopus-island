@@ -300,8 +300,24 @@ coinTiles.forEach(function (value: tiles.Location, index: number) {
     tiles.setTileAt(value, myTiles.tile4);
 })
 
+let lastTile:Image = null;
+let lastX:number = 0;
+let lastY:number = 0;
+
 game.onUpdate(function () {
-	tiles.getTileAt(positionToTile(mySprite.x), positionToTile(mySprite.y))
+	let newTile:Image = tiles.getTileAt(positionToTile(mySprite.x), positionToTile(mySprite.y))
+    if(lastTile == null){
+        lastTile = newTile
+    }
+    if(newTile != lastTile){
+        mySprite.x = lastX
+        mySprite.y = lastY
+        console.log("changed tile");
+        return;
+    }
+    lastX = mySprite.x
+    lastY = mySprite.y
+    lastTile = newTile
 })
 
 function positionToTile(position:number):number{
