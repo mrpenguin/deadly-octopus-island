@@ -30,5 +30,8 @@
     ],
     "testFiles": [
         "test.ts"
+    ],
+    "supportedTargets": [
+        "arcade"
     ]
 }
