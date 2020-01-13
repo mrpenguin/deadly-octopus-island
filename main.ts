@@ -239,13 +239,22 @@ namespace myTiles {
         4 4 5 4 4 5 4 4
     `
 }
+
+class Point {
+    x: number
+    y: number
+    tile: Image = null
+    constructor(x: number = 0, y: number = 0) {
+        this.x = x
+        this.y = y
+    }
+}
+
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
-let lastY:number = 0
-let lastX:number = 0
-let lastTile:Image = null
+let playerPosition:Point = new Point(0,0)
 let mySprite = sprites.create(img`
     . . . . . . . .
     . . . 1 1 . . .
@@ -397,18 +406,31 @@ function isLandTile(tileImage:Image):boolean{
     }
     return false
 }
+
+function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
+    let newTile: Image = tiles.getTileAt(positionToTile(character.x), positionToTile(character.y))
+    if (lastPosition.tile == null) {
+        lastPosition.tile = newTile
+    }
+
+    if (isLandTile(newTile) && isWaterTile(lastPosition.tile) || 
+        isWaterTile(newTile) && isLandTile(lastPosition.tile)) {
+        character.x = lastPosition.x
+        character.y = lastPosition.y
+        return lastPosition;
+    }
+    lastPosition.x = character.x
+    lastPosition.y = character.y
+    lastPosition.tile = newTile
+    return lastPosition
+}
+
 game.onUpdate(function () {
-    let newTile:Image = tiles.getTileAt(positionToTile(mySprite.x), positionToTile(mySprite.y))
-    if (lastTile == null) {
-        lastTile = newTile
-    }
-    if (newTile != lastTile) {
-        mySprite.x = lastX
-        mySprite.y = lastY
-        console.log("changed tile")
-        return;
-    }
-    lastX = mySprite.x
-    lastY = mySprite.y
-    lastTile = newTile
+    playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
+    //move octopus 
+    //move shark 
+    //check for shark/octopus collision with some buffer
 })
+
+//add gun 
+
