@@ -358,10 +358,44 @@ coinTiles.forEach(function (value: tiles.Location, index: number) {
     tiles.setTileAt(value, myTiles.tile4);
 })
 let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
-let octopusSpanwTile = tiles.getTilesByType(myTiles.tile18)[0]
+mySprite.x = playerSpawnTile.x
+mySprite.y = playerSpawnTile.y
+tiles.setTileAt(playerSpawnTile, myTiles.tile2)
+let octopusSpawnTile = tiles.getTilesByType(myTiles.tile18)[0]
+octopus.x = octopusSpawnTile.x
+octopus.y = octopusSpawnTile.y
+tiles.setTileAt(octopusSpawnTile, myTiles.tile2)
 let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
-function positionToTile(position:number):number{
+shark.x = sharkSpawnTile.x
+shark.y = sharkSpawnTile.y
+tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
+function positionToTile(position:number):number {
     return Math.floor(position/8);
+}
+function isWaterTile(tileImage:Image):boolean {
+    if(tileImage == myTiles.tile2 || 
+        tileImage == myTiles.tile3 ||
+        tileImage == myTiles.tile5 ||
+        tileImage == myTiles.tile7 ||
+        tileImage == myTiles.tile8 ||
+        tileImage == myTiles.tile9 ||
+        tileImage == myTiles.tile10 ||
+        tileImage == myTiles.tile11 ||
+        tileImage == myTiles.tile12 ||
+        tileImage == myTiles.tile13 ||
+        tileImage == myTiles.tile14 ||
+        tileImage == myTiles.tile15 ||
+        tileImage == myTiles.tile16){
+        return true
+    }
+    return false
+}
+
+function isLandTile(tileImage:Image):boolean{
+    if(tileImage == myTiles.tile4){
+        return true
+    }
+    return false
 }
 game.onUpdate(function () {
     let newTile:Image = tiles.getTileAt(positionToTile(mySprite.x), positionToTile(mySprite.y))
