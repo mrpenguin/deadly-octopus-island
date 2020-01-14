@@ -255,6 +255,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     otherSprite.destroy()
 })
 let playerPosition:Point = new Point(0,0)
+const hitBuffer:number = 4
 let mySprite = sprites.create(img`
     . . . . . . . .
     . . . 1 1 . . .
@@ -423,6 +424,11 @@ function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
     lastPosition.y = character.y
     lastPosition.tile = newTile
     return lastPosition
+}
+
+function moveOctopus(octopus:Sprite, playerPosition:Point, hitBuffer:number){
+    let moveLeft:boolean = playerPosition.x < octopus.x - hitBuffer
+    let moveRight:boolean = playerPosition.x > octopus.x + octopus.width - hitBuffer
 }
 
 game.onUpdate(function () {
