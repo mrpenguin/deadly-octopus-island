@@ -426,14 +426,17 @@ function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
     return lastPosition
 }
 
-function moveOctopus(octopus:Sprite, playerPosition:Point, hitBuffer:number){
-    let moveLeft:boolean = playerPosition.x < octopus.x - hitBuffer
-    let moveRight:boolean = playerPosition.x > octopus.x + octopus.width - hitBuffer
+function moveOctopus(octopus:Sprite, playerPosition:Point){
+    let moveLeft:boolean = playerPosition.x < octopus.x
+    let moveRight:boolean = playerPosition.x > octopus.x
+    let moveUp:boolean = playerPosition.y < octopus.y
+    let moveDown:boolean = playerPosition.y > octopus.y
 }
 
 game.onUpdate(function () {
     playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
     //move octopus 
+    moveOctopus(octopus, playerPosition)
     //move shark 
     //check for shark/octopus collision with some buffer
 })
