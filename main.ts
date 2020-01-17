@@ -255,6 +255,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     otherSprite.destroy()
 })
 let playerPosition:Point = new Point(0,0)
+let octopusPosition:Point = new Point(0,0)
+let sharkPosition:Point = new Point(0,0)
 const hitBuffer:number = 4
 let mySprite = sprites.create(img`
     . . . . . . . .
@@ -368,16 +370,16 @@ coinTiles.forEach(function (value: tiles.Location, index: number) {
     tiles.setTileAt(value, myTiles.tile4);
 })
 let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
-mySprite.x = playerSpawnTile.x
-mySprite.y = playerSpawnTile.y
+mySprite.x = playerPosition.x = playerSpawnTile.x
+mySprite.y = playerPosition.y = playerSpawnTile.y
 tiles.setTileAt(playerSpawnTile, myTiles.tile2)
 let octopusSpawnTile = tiles.getTilesByType(myTiles.tile18)[0]
-octopus.x = octopusSpawnTile.x
-octopus.y = octopusSpawnTile.y
+octopus.x = octopusPosition.x = octopusSpawnTile.x
+octopus.y = octopusPosition.y = octopusSpawnTile.y
 tiles.setTileAt(octopusSpawnTile, myTiles.tile2)
 let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
-shark.x = sharkSpawnTile.x
-shark.y = sharkSpawnTile.y
+shark.x = sharkPosition.x = sharkSpawnTile.x
+shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
 function positionToTile(position:number):number {
     return Math.floor(position/8);
@@ -426,17 +428,36 @@ function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
     return lastPosition
 }
 
-function moveOctopus(octopus:Sprite, playerPosition:Point){
-    let moveLeft:boolean = playerPosition.x < octopus.x
-    let moveRight:boolean = playerPosition.x > octopus.x
-    let moveUp:boolean = playerPosition.y < octopus.y
-    let moveDown:boolean = playerPosition.y > octopus.y
+function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point): Point {
+    let moveLeft: boolean = playerPosition.x < octopusPosition.x
+    let moveRight: boolean = playerPosition.x > octopusPosition.x
+    let moveUp: boolean = playerPosition.y < octopusPosition.y
+    let moveDown: boolean = playerPosition.y > octopusPosition.y
+    let moveRate: number = .4
+
+    if (moveLeft) {
+        octopusPosition.x -= moveRate
+    } else if (moveRight) {
+        octopusPosition.x += moveRate
+    }
+    if (moveUp) {
+        octopusPosition.y -= moveRate
+    } else if (moveDown) {
+        octopusPosition.y += moveRate
+    }
+    return octopusPosition
+}
+
+function moveSprite(position:Point, sprite:Sprite):void {
+    sprite.x = Math.floor(position.x)
+    sprite.y = Math.floor(position.y)
 }
 
 game.onUpdate(function () {
     playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
     //move octopus 
-    moveOctopus(octopus, playerPosition)
+    octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition)
+    moveSprite(octopusPosition, octopus)
     //move shark 
     //check for shark/octopus collision with some buffer
 })
