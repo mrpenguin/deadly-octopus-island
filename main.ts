@@ -418,6 +418,8 @@ function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
 
     if (isLandTile(newTile) && isWaterTile(lastPosition.tile) || 
         isWaterTile(newTile) && isLandTile(lastPosition.tile)) {
+            //todo: determine whether it's a horizontal or vertical collision and limit movement
+            //also need to check whether the other position change results in a tile collision, like in a corner
         character.x = lastPosition.x
         character.y = lastPosition.y
         return lastPosition;
@@ -429,10 +431,11 @@ function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
 }
 
 function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point): Point {
-    let moveLeft: boolean = playerPosition.x < octopusPosition.x
-    let moveRight: boolean = playerPosition.x > octopusPosition.x
-    let moveUp: boolean = playerPosition.y < octopusPosition.y
-    let moveDown: boolean = playerPosition.y > octopusPosition.y
+    let moveBuffer: number = 5
+    let moveLeft: boolean = playerPosition.x < octopusPosition.x - moveBuffer
+    let moveRight: boolean = playerPosition.x > octopusPosition.x + moveBuffer
+    let moveUp: boolean = playerPosition.y < octopusPosition.y - moveBuffer
+    let moveDown: boolean = playerPosition.y > octopusPosition.y + moveBuffer
     let moveRate: number = .4
 
     if (moveLeft) {
@@ -462,5 +465,5 @@ game.onUpdate(function () {
     //check for shark/octopus collision with some buffer
 })
 
-//add gun 
+//add crate unlock for final item
 
