@@ -250,6 +250,18 @@ class Point {
     }
 }
 
+class GridSpot{
+    row: number
+    column: number
+    constructor(row: number = 0, column: number = 0){
+        this.row = row
+        this.column = column
+    }
+    equals(otherSpot:GridSpot):boolean{
+        return otherSpot.row === this.row && otherSpot.column === this.column
+    }
+}
+
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.setScore(info.score() + 1)
     otherSprite.destroy()
@@ -451,7 +463,7 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
     return octopusPosition
 }
 
-function seekPath(startingTile:Point, targetTile:Point, currentPath:Array<Point>, closedTiles:Array<Point>):Array<Point>{
+function seekPath(startingTile: GridSpot, targetTile: GridSpot, currentPath: Array<GridSpot>, closedTiles: Array<GridSpot>): Array<GridSpot>{
     
     return currentPath
 }
@@ -462,12 +474,23 @@ function findSharkMovePosition(sharkPosition: Point, playerPosition: Point):Poin
     return sharkPosition
 }
 
-function arePointsEqual(point1:Point, point2:Point):boolean{
-    return (point1.x === point2.x) && (point1.y === point2.y)
+function findPlayerTargetTile(playerPosition:Point):GridSpot {
+    let resultGridSpot = new GridSpot()
+    if(isWaterTile(playerPosition.tile)){
+        resultGridSpot.row = positionToTile(playerPosition.y, tileSize)
+        resultGridSpot.column = positionToTile(playerPosition.x, tileSize)
+        return resultGridSpot
+    }
+    //this will fail terribly if there are no water tiles in a straight line anywhere from the player
+    for(let i = 0; i < 10; i++) {
+        //extend out in a straight line in all directions and look for water
+        
+    }
+    return resultGridSpot
 }
 
-function findExactTilePosition(position:Point, tileSize:number):Point{
-    return new Point(positionToTile(position.x, tileSize), positionToTile(position.y, tileSize))
+function findExactTilePosition(position:Point, tileSize:number):GridSpot{
+    return new GridSpot(positionToTile(position.x, tileSize), positionToTile(position.y, tileSize))
 }
 
 function moveGameSprite(position:Point, sprite:Sprite):void {
