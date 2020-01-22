@@ -258,6 +258,7 @@ let playerPosition:Point = new Point(0,0)
 let octopusPosition:Point = new Point(0,0)
 let sharkPosition:Point = new Point(0,0)
 const hitBuffer:number = 4
+const tileSize:number = 8
 let mySprite = sprites.create(img`
     . . . . . . . .
     . . . 1 1 . . .
@@ -381,8 +382,8 @@ let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
 shark.x = sharkPosition.x = sharkSpawnTile.x
 shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
-function positionToTile(position:number):number {
-    return Math.floor(position/8);
+function positionToTile(position:number, tileSize:number):number {
+    return Math.floor(position/tileSize);
 }
 function isWaterTile(tileImage:Image):boolean {
     if(tileImage == myTiles.tile2 || 
@@ -411,7 +412,7 @@ function isLandTile(tileImage:Image):boolean{
 }
 
 function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
-    let newTile: Image = tiles.getTileAt(positionToTile(character.x), positionToTile(character.y))
+    let newTile: Image = tiles.getTileAt(positionToTile(character.x, tileSize), positionToTile(character.y, tileSize))
     if (lastPosition.tile == null) {
         lastPosition.tile = newTile
     }
@@ -430,12 +431,11 @@ function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
     return lastPosition
 }
 
-function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point): Point {
-    let moveBuffer: number = 5
-    let moveLeft: boolean = playerPosition.x < octopusPosition.x - moveBuffer
-    let moveRight: boolean = playerPosition.x > octopusPosition.x + moveBuffer
-    let moveUp: boolean = playerPosition.y < octopusPosition.y - moveBuffer
-    let moveDown: boolean = playerPosition.y > octopusPosition.y + moveBuffer
+function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, buffer:number): Point {
+    let moveLeft: boolean = playerPosition.x < octopusPosition.x - buffer
+    let moveRight: boolean = playerPosition.x > octopusPosition.x + buffer
+    let moveUp: boolean = playerPosition.y < octopusPosition.y - buffer
+    let moveDown: boolean = playerPosition.y > octopusPosition.y + buffer
     let moveRate: number = .4
 
     if (moveLeft) {
@@ -451,7 +451,26 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point):
     return octopusPosition
 }
 
-function moveSprite(position:Point, sprite:Sprite):void {
+function seekPath(startingTile:Point, targetTile:Point, currentPath:Array<Point>, closedTiles:Array<Point>):Array<Point>{
+    
+    return currentPath
+}
+
+function findSharkMovePosition(sharkPosition: Point, playerPosition: Point):Point{
+    //need to keep track of tile position of player and only recalculate if the player has changed tiles
+
+    return sharkPosition
+}
+
+function arePointsEqual(point1:Point, point2:Point):boolean{
+    return (point1.x === point2.x) && (point1.y === point2.y)
+}
+
+function findExactTilePosition(position:Point, tileSize:number):Point{
+    return new Point(positionToTile(position.x, tileSize), positionToTile(position.y, tileSize))
+}
+
+function moveGameSprite(position:Point, sprite:Sprite):void {
     sprite.x = Math.floor(position.x)
     sprite.y = Math.floor(position.y)
 }
@@ -459,8 +478,8 @@ function moveSprite(position:Point, sprite:Sprite):void {
 game.onUpdate(function () {
     playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
     //move octopus 
-    octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition)
-    moveSprite(octopusPosition, octopus)
+    octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, hitBuffer)
+    moveGameSprite(octopusPosition, octopus)
     //move shark 
     //check for shark/octopus collision with some buffer
 })
