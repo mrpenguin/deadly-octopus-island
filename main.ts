@@ -266,9 +266,11 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
+
 let playerPosition:Point = new Point(0,0)
 let octopusPosition:Point = new Point(0,0)
 let sharkPosition:Point = new Point(0,0)
+let sharkSeekPath:Array<GridSpot> = []
 const hitBuffer:number = 4
 const tileSize:number = 8
 let mySprite = sprites.create(img`
@@ -386,14 +388,17 @@ let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
 mySprite.x = playerPosition.x = playerSpawnTile.x
 mySprite.y = playerPosition.y = playerSpawnTile.y
 tiles.setTileAt(playerSpawnTile, myTiles.tile2)
+
 let octopusSpawnTile = tiles.getTilesByType(myTiles.tile18)[0]
 octopus.x = octopusPosition.x = octopusSpawnTile.x
 octopus.y = octopusPosition.y = octopusSpawnTile.y
 tiles.setTileAt(octopusSpawnTile, myTiles.tile2)
+
 let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
 shark.x = sharkPosition.x = sharkSpawnTile.x
 shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
+
 function positionToTile(position:number, tileSize:number):number {
     return Math.floor(position/tileSize);
 }
@@ -468,29 +473,22 @@ function seekPath(startingTile: GridSpot, targetTile: GridSpot, currentPath: Arr
     return currentPath
 }
 
-function findSharkMovePosition(sharkPosition: Point, playerPosition: Point):Point{
+function findSharkMovePosition(sharkPosition: Point, seekPath:Array<GridSpot>):Point{
+
     //need to keep track of tile position of player and only recalculate if the player has changed tiles
 
     return sharkPosition
 }
 
-function findPlayerTargetTile(playerPosition:Point):GridSpot {
+function findSharkTargetTile(playerPosition:Point):GridSpot {
     let resultGridSpot = new GridSpot()
     if(isWaterTile(playerPosition.tile)){
         resultGridSpot.row = positionToTile(playerPosition.y, tileSize)
         resultGridSpot.column = positionToTile(playerPosition.x, tileSize)
         return resultGridSpot
     }
-    //this will fail terribly if there are no water tiles in a straight line anywhere from the player
-    for(let i = 0; i < 10; i++) {
-        //extend out in a straight line in all directions and look for water
-        
-    }
-    return resultGridSpot
-}
 
-function findExactTilePosition(position:Point, tileSize:number):GridSpot{
-    return new GridSpot(positionToTile(position.x, tileSize), positionToTile(position.y, tileSize))
+    return resultGridSpot
 }
 
 function moveGameSprite(position:Point, sprite:Sprite):void {
@@ -504,6 +502,12 @@ game.onUpdate(function () {
     octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, hitBuffer)
     moveGameSprite(octopusPosition, octopus)
     //move shark 
+    let targetTile = findSharkTargetTile(playerPosition)
+    if(targetTile.column > 0 && targetTile.row > 0){ //temporary check to make sure that shark has found a tile
+        if(sharkSeekPath.length === 0 || !targetTile.equals(sharkSeekPath[sharkSeekPath.length - 1])){
+            //sharkSeekPath = seekPath(sharkPosition, (startingTile), [], [])
+        }
+    }
     //check for shark/octopus collision with some buffer
 })
 
