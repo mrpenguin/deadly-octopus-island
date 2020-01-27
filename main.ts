@@ -239,7 +239,11 @@ namespace myTiles {
         4 4 5 4 4 5 4 4
     `
 }
-
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+    info.setScore(info.score() + 1)
+    otherSprite.destroy()
+})
+let sharkSeekPath:Array<GridSpot> = []
 class Point {
     x: number
     y: number
@@ -249,7 +253,6 @@ class Point {
         this.y = y
     }
 }
-
 class GridSpot{
     row: number
     column: number
@@ -261,18 +264,11 @@ class GridSpot{
         return otherSpot.row === this.row && otherSpot.column === this.column
     }
 }
-
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
-    info.setScore(info.score() + 1)
-    otherSprite.destroy()
-})
-
 let playerPosition:Point = new Point(0,0)
 let octopusPosition:Point = new Point(0,0)
 let sharkPosition:Point = new Point(0,0)
-let sharkSeekPath:Array<GridSpot> = []
-const hitBuffer:number = 4
-const tileSize:number = 8
+let hitBuffer = 4
+let tileSize = 8
 let mySprite = sprites.create(img`
     . . . . . . . .
     . . . 1 1 . . .
@@ -284,37 +280,37 @@ let mySprite = sprites.create(img`
     . . . . . . . .
 `, SpriteKind.Player)
 let octopus = sprites.create(img`
-    . d d d d . . . . . . . d d d d d d . . . . . . . . . d d d . .
-    d d d . . . . . . . . d d d d d d d d d . . . . . d d d d d d .
-    d d . . . . . . . . d d d d . . . . . d d . . . . d d . . . d d
-    d d . . . . . . . . d d d . . . . . . . . . . . d d d . . . d d
-    d d . d . . . . . . d d d . . . . . . . . . . d d d d . . . . d
-    d d d . . . . . . . d d d d . . . . . . . . d d d d d . . . . .
-    d d d d . . . . . . d d d 8 8 8 8 8 d d . . d d d d . . . . . .
-    . d d d d . . . . . . 8 8 d d d d d d d d d d d d . . . . . . .
-    . . d d d d d d d . 8 d d d d d d d d d d d d d d . . . . . . .
-    . . . d d d d d d 8 d d d d d d d d d d d d d d . . . . . . . .
-    . . . . . d d d d 8 d d d d d d d d d d d d d d . . . . . d d .
-    . . . . . . d d 8 d d d d d d d d d d d d d d d d . d d d d d d
-    . . . . . . . . 8 d d d d d d d d d d d d d d d d d d d d d d d
-    . . . . . . . . d d d d d d d d d d d d d d d d d d d d d . d d
-    . . . . . . . . d d d d d d d d d d d d d d d d d d d . . . d d
-    . . . . . . . . d d d d d d d d d d d d d d d d d . . . . . . d
-    . . . . . . . d d d d d d d d d d d d d d d d d 1 . . . . d d d
-    . . . . . . d d d d d d d d d d d d d d d d d d 1 . . . . d d .
-    . . . . d d d d d d d d d d d d d d d d d d d 1 d . . . . d . .
-    . . d d d d d d d d d d d d d d d d d d d d d 1 d d d . . . . .
-    . d d d d d d d d d d d d d d d d d d d d d d d d d d . . . . .
-    d d d d d . . . . . d d d d d d d d d d 1 1 . d d d d d . . . .
-    d d d d . . . . . d d d d d d d d 1 1 1 d d . . . d d d d . . .
-    d d d . . . . . . d d d d d . . . d d d d d . . . d d d d . . .
-    d d d . . . . . . d d d . . . . . . d d d d . . . . . d d d . .
-    d d d . . . . . . d d d . . . . . . . d d d d . . . . d d d . .
-    d d d . . . . . d d d . . . . . . . . . d d d . . . . d d d d .
-    d d . . . . . . d d d . . . . . . . . . d d d . . . . . d d d .
-    d d . . . . . . d d d . . . . . . . . . . d d d . . . . . d d d
-    d d . . . . . . d d d . . . . . . . . d . . d d . . . . . . d d
-    d d d . . . . . . d d . . . . . . . . d d d d d . . . . . . d d
+    . a d d d . . . . . . . a d d d d d . . . . . . . . a a d d . .
+    a d d . . . . . . . . a d d d d d d d d . . . . . a d d d d d .
+    a d . . . . . . . . a d d 1 . . . . . d d . . . . a d . . . d d
+    a d . . . . . . . . a d 1 . . . . . . . . . . . a d 1 . . . d d
+    a d . . . . . . . . a d 1 . . . . . . . . . . a d d 1 . . . . d
+    a d 1 . . . . . . . a d d d . . . . . . . . a d d d 1 . . . . .
+    a d d 1 . . . . . . a d d a a a a a d d . . a d d d . . . . . .
+    . a d d 1 . . . . . . a a d d d d d d d d d d d 1 . . . . . . .
+    . . a d d d d d d . a d d d d d a d d d d d d d 1 . . . . . . .
+    . . . a a d d d d a d d d a d d d d d d a d d d . . . . . . . .
+    . . . . . a d d d a d d d d d d d d d d d d d d . . . . . a d .
+    . . . . . . a a a d d d d d d d d a d d d d d d d . a a a d d d
+    . . . . . . . . a d d a d d d d d d d d d d a d d a d d d d d d
+    . . . . . . . . d d d d d d d d d d d d d d d d d d d 1 1 . d d
+    . . . . . . . . d d d d d d d 1 1 1 d d d d d d d d d . . . d d
+    . . . . . . . . d d d d d d 1 a a a 1 d d d d d d . . . . . . d
+    . . . . . . . a d d d d d d 1 a d a 1 d d d d d 1 . . . . d d d
+    . . . . . . a d d d d d d d 1 a d a 1 d d d d d 1 . . . . d d .
+    . . . . a a d d d d d d d d 1 a a a 1 d d d d 1 d . . . . d . .
+    . . a a d d d d d d d d d d d 1 1 1 d d d d d 1 d d 1 . . . . .
+    . a d d d d d 1 1 1 d d d d d d d d d d d d d d d d 1 . . . . .
+    a d d d d . . . . . a a d d d d d d d d 1 1 . d d d d 1 . . . .
+    a d d d . . . . . a d d d d d d d 1 1 1 d 1 . . . d d d 1 . . .
+    a d d . . . . . . a d d d d . . . d d d d 1 . . . a d d 1 . . .
+    a d d . . . . . . a d d . . . . . . a d d 1 . . . . . d d 1 . .
+    a d d . . . . . . a d d . . . . . . . a d d 1 . . . . d d 1 . .
+    a d d . . . . . a d d . . . . . . . . . a d 1 . . . . a d d 1 .
+    d d . . . . . . a d d . . . . . . . . . a d d . . . . . d d d .
+    d d . . . . . . a d d . . . . . . . . . . d d d . . . . . d d d
+    d d . . . . . . a d d . . . . . . . . d . . d d . . . . . . a d
+    d d d . . . . . . a d . . . . . . . . d d d d d . . . . . . d d
     . d d . . . . . . . d d d . . . . . . . d d d . . . . . . d . .
 `, SpriteKind.Enemy)
 let shark = sprites.create(img`
@@ -388,17 +384,14 @@ let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
 mySprite.x = playerPosition.x = playerSpawnTile.x
 mySprite.y = playerPosition.y = playerSpawnTile.y
 tiles.setTileAt(playerSpawnTile, myTiles.tile2)
-
 let octopusSpawnTile = tiles.getTilesByType(myTiles.tile18)[0]
 octopus.x = octopusPosition.x = octopusSpawnTile.x
 octopus.y = octopusPosition.y = octopusSpawnTile.y
 tiles.setTileAt(octopusSpawnTile, myTiles.tile2)
-
 let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
 shark.x = sharkPosition.x = sharkSpawnTile.x
 shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
-
 function positionToTile(position:number, tileSize:number):number {
     return Math.floor(position/tileSize);
 }
@@ -420,14 +413,12 @@ function isWaterTile(tileImage:Image):boolean {
     }
     return false
 }
-
 function isLandTile(tileImage:Image):boolean{
     if(tileImage == myTiles.tile4){
         return true
     }
     return false
 }
-
 function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
     let newTile: Image = tiles.getTileAt(positionToTile(character.x, tileSize), positionToTile(character.y, tileSize))
     if (lastPosition.tile == null) {
@@ -447,7 +438,6 @@ function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
     lastPosition.tile = newTile
     return lastPosition
 }
-
 function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, buffer:number): Point {
     let moveLeft: boolean = playerPosition.x < octopusPosition.x - buffer
     let moveRight: boolean = playerPosition.x > octopusPosition.x + buffer
@@ -467,19 +457,16 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
     }
     return octopusPosition
 }
-
 function seekPath(startingTile: GridSpot, targetTile: GridSpot, currentPath: Array<GridSpot>, closedTiles: Array<GridSpot>): Array<GridSpot>{
     
     return currentPath
 }
-
 function findSharkMovePosition(sharkPosition: Point, seekPath:Array<GridSpot>):Point{
 
     //need to keep track of tile position of player and only recalculate if the player has changed tiles
 
     return sharkPosition
 }
-
 function findSharkTargetTile(playerPosition:Point):GridSpot {
     let resultGridSpot = new GridSpot()
     if(isWaterTile(playerPosition.tile)){
@@ -490,26 +477,20 @@ function findSharkTargetTile(playerPosition:Point):GridSpot {
 
     return resultGridSpot
 }
-
 function moveGameSprite(position:Point, sprite:Sprite):void {
     sprite.x = Math.floor(position.x)
     sprite.y = Math.floor(position.y)
 }
-
 game.onUpdate(function () {
     playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
-    //move octopus 
+// move octopus
     octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, hitBuffer)
-    moveGameSprite(octopusPosition, octopus)
-    //move shark 
+moveGameSprite(octopusPosition, octopus)
+// move shark
     let targetTile = findSharkTargetTile(playerPosition)
-    if(targetTile.column > 0 && targetTile.row > 0){ //temporary check to make sure that shark has found a tile
-        if(sharkSeekPath.length === 0 || !targetTile.equals(sharkSeekPath[sharkSeekPath.length - 1])){
-            //sharkSeekPath = seekPath(sharkPosition, (startingTile), [], [])
+if (targetTile.column > 0 && targetTile.row > 0) {
+        if (sharkSeekPath.length == 0 || !(targetTile.equals(sharkSeekPath[sharkSeekPath.length - 1]))) {
+        	
         }
     }
-    //check for shark/octopus collision with some buffer
 })
-
-//add crate unlock for final item
-
