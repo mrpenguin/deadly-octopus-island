@@ -536,7 +536,7 @@ moveGameSprite(octopusPosition, octopus)
 // move shark
     sharkTargetTile = findSharkTargetTile(playerPosition)
     if (sharkTargetTile.getColumn() > 0 && sharkTargetTile.getRow() > 0) {
-        if (sharkSeekPath.length == 0 || !(sharkTargetTile.equals(sharkSeekPath[sharkSeekPath.length - 1]))) {
+        if (sharkSeekPath.length == 0 || !(sharkTargetTile.equals(sharkSeekPath[sharkSeekPath.length - 1].point))) {
         	sharkSeekPath = seekPath(sharkPosition, sharkTargetTile, [], [])
         }
     }
