@@ -239,11 +239,14 @@ namespace myTiles {
         4 4 5 4 4 5 4 4
     `
 }
+const hitBuffer = 4
+const tileSize = 8
+
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
-let sharkSeekPath:Array<GridSpot> = []
+let sharkSeekPath:Array<PathPosition> = []
 class Point {
     x: number
     y: number
@@ -252,23 +255,32 @@ class Point {
         this.x = x
         this.y = y
     }
-}
-class GridSpot{
-    row: number
-    column: number
-    constructor(row: number = 0, column: number = 0){
-        this.row = row
-        this.column = column
+    getColumn():number{
+        return Math.floor(this.x / tileSize);
     }
-    equals(otherSpot:GridSpot):boolean{
-        return otherSpot.row === this.row && otherSpot.column === this.column
+    getRow():number{
+        return Math.floor(this.y / tileSize);
+    }
+    equals(otherPoint:Point):boolean{
+        return this.x === otherPoint.x && this.y === otherPoint.y
+    }
+}
+class PathPosition{
+    point: Point
+    distanceFromTarget: number
+    distanceFromParent: number
+    pathParent: Point
+    constructor(point:Point){
+        this.point = point
+    }
+    calculateDistance(otherPosition: PathPosition): number {
+        //using Manhattan calculation since shark can only move four directions
+        return Math.abs(otherPosition.point.x - this.point.x) + Math.abs(otherPosition.point.y - this.point.y)
     }
 }
 let playerPosition:Point = new Point(0,0)
 let octopusPosition:Point = new Point(0,0)
 let sharkPosition:Point = new Point(0,0)
-let hitBuffer = 4
-let tileSize = 8
 let mySprite = sprites.create(img`
     . . . . . . . .
     . . . 1 1 . . .
@@ -392,6 +404,7 @@ let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
 shark.x = sharkPosition.x = sharkSpawnTile.x
 shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
+let sharkTargetTile = new Point();
 function positionToTile(position:number, tileSize:number):number {
     return Math.floor(position/tileSize);
 }
@@ -457,23 +470,57 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
     }
     return octopusPosition
 }
-function seekPath(startingTile: GridSpot, targetTile: GridSpot, currentPath: Array<GridSpot>, closedTiles: Array<GridSpot>): Array<GridSpot>{
-    
-    return currentPath
+function seekPath(startingTile: Point, targetTile: Point, 
+    openTiles: Array<PathPosition>, closedTiles: Array<PathPosition>): Array<PathPosition>{
+    /*while the open list is not empty
+    a) find the node with the least f on
+       the open list, call it "q"
+
+    b) pop q off the open list
+
+    c) generate q's 8 successors and set their
+       parents to q
+
+    d) for each successor
+        i) if successor is the goal, stop search
+          successor.g = q.g + distance between
+                              successor and q
+          successor.h = distance from goal to
+          successor (This can be done using many
+          ways, we will discuss three heuristics-
+          Manhattan, Diagonal and Euclidean
+          Heuristics)
+
+          successor.f = successor.g + successor.h
+
+        ii) if a node with the same position as
+            successor is in the OPEN list which has a
+           lower f than successor, skip this successor
+
+        iii) if a node with the same position as
+            successor  is in the CLOSED list which has
+            a lower f than successor, skip this successor
+            otherwise, add  the node to the open list
+     end (for loop)
+
+    e) push q on the closed list
+    end (while loop)*/
+    return []
 }
-function findSharkMovePosition(sharkPosition: Point, seekPath:Array<GridSpot>):Point{
+function findSharkMovePosition(sharkPosition: Point, seekPath:Array<Point>):Point{
 
     //need to keep track of tile position of player and only recalculate if the player has changed tiles
 
     return sharkPosition
 }
-function findSharkTargetTile(playerPosition:Point):GridSpot {
-    let resultGridSpot = new GridSpot()
+function findSharkTargetTile(playerPosition: Point): Point {
+    let resultGridSpot = new Point()
     if(isWaterTile(playerPosition.tile)){
-        resultGridSpot.row = positionToTile(playerPosition.y, tileSize)
-        resultGridSpot.column = positionToTile(playerPosition.x, tileSize)
+        resultGridSpot.y = playerPosition.y
+        resultGridSpot.x = playerPosition.x
         return resultGridSpot
     }
+    //todo: implement roaming
 
     return resultGridSpot
 }
@@ -487,10 +534,10 @@ game.onUpdate(function () {
     octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, hitBuffer)
 moveGameSprite(octopusPosition, octopus)
 // move shark
-    let targetTile = findSharkTargetTile(playerPosition)
-if (targetTile.column > 0 && targetTile.row > 0) {
-        if (sharkSeekPath.length == 0 || !(targetTile.equals(sharkSeekPath[sharkSeekPath.length - 1]))) {
-        	
+    sharkTargetTile = findSharkTargetTile(playerPosition)
+    if (sharkTargetTile.getColumn() > 0 && sharkTargetTile.getRow() > 0) {
+        if (sharkSeekPath.length == 0 || !(sharkTargetTile.equals(sharkSeekPath[sharkSeekPath.length - 1]))) {
+        	sharkSeekPath = seekPath(sharkPosition, sharkTargetTile, [], [])
         }
     }
 })
