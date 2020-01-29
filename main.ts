@@ -277,6 +277,9 @@ class PathPosition{
         //using Manhattan calculation since shark can only move four directions
         return Math.abs(otherPosition.point.x - this.point.x) + Math.abs(otherPosition.point.y - this.point.y)
     }
+    findTotalDistance():number{
+        return this.distanceFromTarget + this.distanceFromParent
+    }
 }
 let playerPosition:Point = new Point(0,0)
 let octopusPosition:Point = new Point(0,0)
@@ -470,8 +473,15 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
     }
     return octopusPosition
 }
+
 function seekPath(startingTile: Point, targetTile: Point, 
     openTiles: Array<PathPosition>, closedTiles: Array<PathPosition>): Array<PathPosition>{
+        let shortestPathTile:PathPosition = null
+        while(openTiles.length > 0){
+            shortestPathTile = findShortestPathTile(openTiles)
+            openTiles.removeElement(shortestPathTile)
+            closedTiles.push(shortestPathTile)
+        }
     /*while the open list is not empty
     a) find the node with the least f on
        the open list, call it "q"
@@ -506,6 +516,19 @@ function seekPath(startingTile: Point, targetTile: Point,
     e) push q on the closed list
     end (while loop)*/
     return []
+}
+function findShortestPathTile(openTiles:Array<PathPosition>):PathPosition{
+    let shortestPath:PathPosition = null
+    openTiles.forEach(function (value: PathPosition, index: number) {
+        if(shortestPath != null){
+            if(value.findTotalDistance() < shortestPath.findTotalDistance()){
+                shortestPath = value
+            }
+        } else{
+            shortestPath = value
+        }
+    })
+    return shortestPath
 }
 function findSharkMovePosition(sharkPosition: Point, seekPath:Array<Point>):Point{
 
