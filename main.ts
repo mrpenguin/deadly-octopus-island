@@ -239,14 +239,13 @@ namespace myTiles {
         4 4 5 4 4 5 4 4
     `
 }
-const hitBuffer = 4
-const tileSize = 8
-
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
 let sharkSeekPath:Array<PathPosition> = []
+let hitBuffer = 4
+let tileSize = 8
 class Point {
     x: number
     y: number
@@ -389,6 +388,7 @@ tiles.setTilemap(tiles.createTilemap(
             [myTiles.tile0,myTiles.tile2,myTiles.tile3,myTiles.tile4,myTiles.tile5,myTiles.tile6,myTiles.tile7,myTiles.tile8,myTiles.tile9,myTiles.tile10,myTiles.tile11,myTiles.tile12,myTiles.tile13,myTiles.tile14,myTiles.tile15,myTiles.tile16,myTiles.tile17,myTiles.tile18,myTiles.tile19,myTiles.tile20,myTiles.tile21],
             TileScale.Eight
         ))
+
 let coinTiles = tiles.getTilesByType(myTiles.tile6)
 coinTiles.forEach(function (value: tiles.Location, index: number) {
     let newCoin = sprites.create(coin.image, SpriteKind.Food)
@@ -473,7 +473,6 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
     }
     return octopusPosition
 }
-
 function seekPath(startingTile: Point, targetTile: Point, 
     openTiles: Array<PathPosition>, closedTiles: Array<PathPosition>): Array<PathPosition>{
         let shortestPathTile:PathPosition = null
@@ -481,6 +480,7 @@ function seekPath(startingTile: Point, targetTile: Point,
             shortestPathTile = findShortestPathTile(openTiles)
             openTiles.removeElement(shortestPathTile)
             closedTiles.push(shortestPathTile)
+
         }
     /*while the open list is not empty
     a) find the node with the least f on
@@ -530,6 +530,18 @@ function findShortestPathTile(openTiles:Array<PathPosition>):PathPosition{
     })
     return shortestPath
 }
+function getSurroundingPathTiles(tile:PathPosition):Array<PathPosition>{
+    let results = []
+    let levelWidth = 32 //todo: actually calculate the size
+    if(tile.point.y - tileSize > 0){
+        results.push(new PathPosition(new Point(tile.point.x, tile.point.y - tileSize)))
+    }
+    if (tile.point.x + tileSize <= levelWidth * tileSize) {
+        results.push(new PathPosition(new Point(tile.point.x + tileSize, tile.point.y)))
+    }
+
+    return results
+}
 function findSharkMovePosition(sharkPosition: Point, seekPath:Array<Point>):Point{
 
     //need to keep track of tile position of player and only recalculate if the player has changed tiles
@@ -558,9 +570,9 @@ game.onUpdate(function () {
 moveGameSprite(octopusPosition, octopus)
 // move shark
     sharkTargetTile = findSharkTargetTile(playerPosition)
-    if (sharkTargetTile.getColumn() > 0 && sharkTargetTile.getRow() > 0) {
+if (sharkTargetTile.getColumn() > 0 && sharkTargetTile.getRow() > 0) {
         if (sharkSeekPath.length == 0 || !(sharkTargetTile.equals(sharkSeekPath[sharkSeekPath.length - 1].point))) {
-        	sharkSeekPath = seekPath(sharkPosition, sharkTargetTile, [], [])
+            sharkSeekPath = seekPath(sharkPosition, sharkTargetTile, [], [])
         }
     }
 })
