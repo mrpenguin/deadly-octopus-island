@@ -476,11 +476,19 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
 function seekPath(startingTile: Point, targetTile: Point, 
     openTiles: Array<PathPosition>, closedTiles: Array<PathPosition>): Array<PathPosition>{
         let shortestPathTile:PathPosition = null
+        let isValidTile:boolean = true
         while(openTiles.length > 0){
             shortestPathTile = findShortestPathTile(openTiles)
             openTiles.removeElement(shortestPathTile)
             closedTiles.push(shortestPathTile)
+            getSurroundingPathTiles(shortestPathTile).forEach(function (value: PathPosition, index: number) {
+                isValidTile = true
+                //search open tiles
 
+                //search closed tiles
+
+                //search map tile
+            })
         }
     /*while the open list is not empty
     a) find the node with the least f on
@@ -533,11 +541,18 @@ function findShortestPathTile(openTiles:Array<PathPosition>):PathPosition{
 function getSurroundingPathTiles(tile:PathPosition):Array<PathPosition>{
     let results = []
     let levelWidth = 32 //todo: actually calculate the size
+    let levelHeight = 32 //todo: actually calculate the size
     if(tile.point.y - tileSize > 0){
         results.push(new PathPosition(new Point(tile.point.x, tile.point.y - tileSize)))
     }
     if (tile.point.x + tileSize <= levelWidth * tileSize) {
         results.push(new PathPosition(new Point(tile.point.x + tileSize, tile.point.y)))
+    }
+    if (tile.point.y + tileSize <= levelHeight * tileSize) {
+        results.push(new PathPosition(new Point(tile.point.x, tile.point.y + tileSize)))
+    }
+    if (tile.point.x - tileSize > 0) {
+        results.push(new PathPosition(new Point(tile.point.x - tileSize, tile.point.y)))
     }
 
     return results
