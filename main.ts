@@ -268,13 +268,19 @@ class PathPosition{
     point: Point
     distanceFromTarget: number
     distanceFromParent: number
-    pathParent: Point
+    pathParent: PathPosition
     constructor(point:Point){
         this.point = point
     }
     calculateDistance(otherPosition: PathPosition): number {
         //using Manhattan calculation since shark can only move four directions
         return Math.abs(otherPosition.point.x - this.point.x) + Math.abs(otherPosition.point.y - this.point.y)
+    }
+    equalsPathPosition(otherPathPosition:PathPosition):boolean{
+        return this.point.getColumn() === otherPathPosition.point.getColumn() && this.point.getRow() === otherPathPosition.point.getRow()
+    }
+    equalsPoint(otherPoint:Point):boolean{
+        return this.point.getColumn() === otherPoint.getColumn() && this.point.getRow() === otherPoint.getRow()
     }
     findTotalDistance():number{
         return this.distanceFromTarget + this.distanceFromParent
@@ -473,32 +479,64 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
     }
     return octopusPosition
 }
-function seekPath(startingTile: Point, targetTile: Point, 
-    openTiles: Array<PathPosition>, closedTiles: Array<PathPosition>): Array<PathPosition>{
-        let shortestPathTile:PathPosition = null
-        let isValidTile:boolean = true
-        while(openTiles.length > 0){
-            shortestPathTile = findShortestPathTile(openTiles)
-            openTiles.removeElement(shortestPathTile)
-            closedTiles.push(shortestPathTile)
-            getSurroundingPathTiles(shortestPathTile).forEach(function (value: PathPosition, index: number) {
-                isValidTile = true
+function seekPath(startingTile: Point, targetTile: Point, openTiles: Array<PathPosition>, closedTiles: Array<PathPosition>): Array<PathPosition>{
+    let shortestPathTile:PathPosition = null
+    let finalPathTile:PathPosition = null
+    let isValidTile:boolean = true
+    let finalPath:Array<PathPosition> = []
+    let i:number = 0
+    let j:number = 0
+    while(openTiles.length > 0){
+        shortestPathTile = findShortestPathTile(openTiles)
+        openTiles.removeElement(shortestPathTile)
+        closedTiles.push(shortestPathTile)
+        let surroundingTiles = getSurroundingPathTiles(shortestPathTile);
+        for(i = 0; i < surroundingTiles.length; i++) {
+            isValidTile = true
+            if(surroundingTiles[i].equalsPoint(targetTile)){
+                surroundingTiles[i].pathParent = shortestPathTile
+                finalPathTile = surroundingTiles[i]
+                break
+            } else {
                 //search open tiles
-
+                for (j = 0; j < openTiles.length; j++) {
+                    if (surroundingTiles[i].equalsPathPosition(openTiles[j])) {
+                        isValidTile = false
+                        break
+                    }
+                }
+                if (!isValidTile) {
+                    continue
+                }
                 //search closed tiles
+                for (j = 0; j < closedTiles.length; j++) {
+                    if (surroundingTiles[i].equalsPathPosition(closedTiles[j])) {
+                        isValidTile = false
+                        break
+                    }
+                }
+                if (!isValidTile) {
+                    continue
+                }
 
                 //search map tile
-            })
+                surroundingTiles[i].point.tile = tiles.getTileAt(surroundingTiles[i].point.x, surroundingTiles[i].point.y)
+                if (isLandTile(surroundingTiles[i].point.tile)) {
+                    closedTiles.push(surroundingTiles[i])
+                    continue
+                }
+
+                surroundingTiles[i].pathParent = shortestPathTile
+            }
+            if(finalPathTile != null){
+                break
+            }
         }
-    /*while the open list is not empty
-    a) find the node with the least f on
-       the open list, call it "q"
-
-    b) pop q off the open list
-
-    c) generate q's 8 successors and set their
-       parents to q
-
+    }
+    if(finalPathTile != null){
+        //build final array
+    }
+/*
     d) for each successor
         i) if successor is the goal, stop search
           successor.g = q.g + distance between
@@ -523,7 +561,7 @@ function seekPath(startingTile: Point, targetTile: Point,
 
     e) push q on the closed list
     end (while loop)*/
-    return []
+    return finalPath
 }
 function findShortestPathTile(openTiles:Array<PathPosition>):PathPosition{
     let shortestPath:PathPosition = null
