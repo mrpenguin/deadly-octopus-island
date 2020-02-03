@@ -243,7 +243,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
-let sharkSeekPath:Array<PathPosition> = []
+let sharkSeekPath: Array<PathPosition> = []
 let hitBuffer = 4
 let tileSize = 8
 class Point {
@@ -254,41 +254,41 @@ class Point {
         this.x = x
         this.y = y
     }
-    getColumn():number{
+    getColumn(): number {
         return Math.floor(this.x / tileSize);
     }
-    getRow():number{
+    getRow(): number {
         return Math.floor(this.y / tileSize);
     }
-    equals(otherPoint:Point):boolean{
+    equals(otherPoint: Point): boolean {
         return this.x === otherPoint.x && this.y === otherPoint.y
     }
 }
-class PathPosition{
+class PathPosition {
     point: Point
     distanceFromTarget: number
     distanceFromParent: number
     pathParent: PathPosition
-    constructor(point:Point){
+    constructor(point: Point) {
         this.point = point
     }
     calculateDistance(otherPosition: PathPosition): number {
         //using Manhattan calculation since shark can only move four directions
         return Math.abs(otherPosition.point.x - this.point.x) + Math.abs(otherPosition.point.y - this.point.y)
     }
-    equalsPathPosition(otherPathPosition:PathPosition):boolean{
+    equalsPathPosition(otherPathPosition: PathPosition): boolean {
         return this.point.getColumn() === otherPathPosition.point.getColumn() && this.point.getRow() === otherPathPosition.point.getRow()
     }
-    equalsPoint(otherPoint:Point):boolean{
+    equalsPoint(otherPoint: Point): boolean {
         return this.point.getColumn() === otherPoint.getColumn() && this.point.getRow() === otherPoint.getRow()
     }
-    findTotalDistance():number{
+    findTotalDistance(): number {
         return this.distanceFromTarget + this.distanceFromParent
     }
 }
-let playerPosition:Point = new Point(0,0)
-let octopusPosition:Point = new Point(0,0)
-let sharkPosition:Point = new Point(0,0)
+let playerPosition: Point = new Point(0, 0)
+let octopusPosition: Point = new Point(0, 0)
+let sharkPosition: Point = new Point(0, 0)
 let mySprite = sprites.create(img`
     . . . . . . . .
     . . . 1 1 . . .
@@ -356,44 +356,44 @@ let coin = sprites.create(img`
 controller.moveSprite(mySprite)
 scene.cameraFollowSprite(mySprite)
 tiles.setTilemap(tiles.createTilemap(
-            hex`2000200001010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010110010101010101010101010101010101010101010101010101110101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101011313010101010101010101010101010101010101010101010101010101010102030303030303030303030303030314010101010101010101010101010101010203030303030303030303030303031401010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010102030304011201010101010101010101010101010101010101010101010101010203050401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102050304010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020305040101010101010101010101010101010101010101010101010101010102030304010101010101010101010101010101010101010101010101010101010205030401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102030504010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010101131301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101`,
-            img`
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            `,
-            [myTiles.tile0,myTiles.tile2,myTiles.tile3,myTiles.tile4,myTiles.tile5,myTiles.tile6,myTiles.tile7,myTiles.tile8,myTiles.tile9,myTiles.tile10,myTiles.tile11,myTiles.tile12,myTiles.tile13,myTiles.tile14,myTiles.tile15,myTiles.tile16,myTiles.tile17,myTiles.tile18,myTiles.tile19,myTiles.tile20,myTiles.tile21],
-            TileScale.Eight
-        ))
+    hex`2000200001010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010110010101010101010101010101010101010101010101010101110101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101011313010101010101010101010101010101010101010101010101010101010102030303030303030303030303030314010101010101010101010101010101010203030303030303030303030303031401010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010102030304011201010101010101010101010101010101010101010101010101010203050401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102050304010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020305040101010101010101010101010101010101010101010101010101010102030304010101010101010101010101010101010101010101010101010101010205030401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102030504010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010101131301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101`,
+    img`
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    `,
+    [myTiles.tile0, myTiles.tile2, myTiles.tile3, myTiles.tile4, myTiles.tile5, myTiles.tile6, myTiles.tile7, myTiles.tile8, myTiles.tile9, myTiles.tile10, myTiles.tile11, myTiles.tile12, myTiles.tile13, myTiles.tile14, myTiles.tile15, myTiles.tile16, myTiles.tile17, myTiles.tile18, myTiles.tile19, myTiles.tile20, myTiles.tile21],
+    TileScale.Eight
+))
 
 let coinTiles = tiles.getTilesByType(myTiles.tile6)
 coinTiles.forEach(function (value: tiles.Location, index: number) {
@@ -414,11 +414,11 @@ shark.x = sharkPosition.x = sharkSpawnTile.x
 shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
 let sharkTargetTile = new Point();
-function positionToTile(position:number, tileSize:number):number {
-    return Math.floor(position/tileSize);
+function positionToTile(position: number, tileSize: number): number {
+    return Math.floor(position / tileSize);
 }
-function isWaterTile(tileImage:Image):boolean {
-    if(tileImage == myTiles.tile2 || 
+function isWaterTile(tileImage: Image): boolean {
+    if (tileImage == myTiles.tile2 ||
         tileImage == myTiles.tile3 ||
         tileImage == myTiles.tile5 ||
         tileImage == myTiles.tile7 ||
@@ -430,27 +430,27 @@ function isWaterTile(tileImage:Image):boolean {
         tileImage == myTiles.tile13 ||
         tileImage == myTiles.tile14 ||
         tileImage == myTiles.tile15 ||
-        tileImage == myTiles.tile16){
+        tileImage == myTiles.tile16) {
         return true
     }
     return false
 }
-function isLandTile(tileImage:Image):boolean{
-    if(tileImage == myTiles.tile4){
+function isLandTile(tileImage: Image): boolean {
+    if (tileImage == myTiles.tile4) {
         return true
     }
     return false
 }
-function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
+function checkLandBoundsCollision(character: Sprite, lastPosition: Point): Point {
     let newTile: Image = tiles.getTileAt(positionToTile(character.x, tileSize), positionToTile(character.y, tileSize))
     if (lastPosition.tile == null) {
         lastPosition.tile = newTile
     }
 
-    if (isLandTile(newTile) && isWaterTile(lastPosition.tile) || 
+    if (isLandTile(newTile) && isWaterTile(lastPosition.tile) ||
         isWaterTile(newTile) && isLandTile(lastPosition.tile)) {
-            //todo: determine whether it's a horizontal or vertical collision and limit movement
-            //also need to check whether the other position change results in a tile collision, like in a corner
+        //todo: determine whether it's a horizontal or vertical collision and limit movement
+        //also need to check whether the other position change results in a tile collision, like in a corner
         character.x = lastPosition.x
         character.y = lastPosition.y
         return lastPosition;
@@ -460,7 +460,7 @@ function checkLandBoundsCollision(character:Sprite, lastPosition:Point):Point{
     lastPosition.tile = newTile
     return lastPosition
 }
-function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, buffer:number): Point {
+function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, buffer: number): Point {
     let moveLeft: boolean = playerPosition.x < octopusPosition.x - buffer
     let moveRight: boolean = playerPosition.x > octopusPosition.x + buffer
     let moveUp: boolean = playerPosition.y < octopusPosition.y - buffer
@@ -479,21 +479,26 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
     }
     return octopusPosition
 }
-function seekPath(startingTile: Point, targetTile: Point, openTiles: Array<PathPosition>, closedTiles: Array<PathPosition>): Array<PathPosition>{
-    let shortestPathTile:PathPosition = null
-    let finalPathTile:PathPosition = null
-    let isValidTile:boolean = true
-    let finalPath:Array<PathPosition> = []
-    let i:number = 0
-    let j:number = 0
-    while(openTiles.length > 0){
+function seekPath(startingTile: Point, targetTile: Point): Array<PathPosition> {
+    let shortestPathTile: PathPosition = null
+    let finalPathTile: PathPosition = null
+    let isValidTile: boolean = true
+    let finalPath: Array<PathPosition> = [] 
+    let openTiles: Array<PathPosition> = [new PathPosition(startingTile)]
+    let closedTiles: Array<PathPosition> = []
+    let i: number = 0
+    let j: number = 0
+    console.log("open tiles")
+    console.log(openTiles)
+    while (openTiles.length > 0) {
+        console.log("here")
         shortestPathTile = findShortestPathTile(openTiles)
         openTiles.removeElement(shortestPathTile)
         closedTiles.push(shortestPathTile)
         let surroundingTiles = getSurroundingPathTiles(shortestPathTile);
-        for(i = 0; i < surroundingTiles.length; i++) {
+        for (i = 0; i < surroundingTiles.length; i++) {
             isValidTile = true
-            if(surroundingTiles[i].equalsPoint(targetTile)){
+            if (surroundingTiles[i].equalsPoint(targetTile)) {
                 surroundingTiles[i].pathParent = shortestPathTile
                 finalPathTile = surroundingTiles[i]
                 break
@@ -501,6 +506,9 @@ function seekPath(startingTile: Point, targetTile: Point, openTiles: Array<PathP
                 //search open tiles
                 for (j = 0; j < openTiles.length; j++) {
                     if (surroundingTiles[i].equalsPathPosition(openTiles[j])) {
+                        if (openTiles[j].findTotalDistance() > surroundingTiles[i].findTotalDistance()) {
+                            openTiles[j] = surroundingTiles[i] //replace current open tile with this one
+                        }
                         isValidTile = false
                         break
                     }
@@ -528,59 +536,39 @@ function seekPath(startingTile: Point, targetTile: Point, openTiles: Array<PathP
 
                 surroundingTiles[i].pathParent = shortestPathTile
             }
-            if(finalPathTile != null){
+            if (finalPathTile != null) {
                 break
             }
         }
     }
-    if(finalPathTile != null){
+    if (finalPathTile != null) {
         //build final array
+        let currentPathTile: PathPosition = finalPathTile
+        while (currentPathTile != null) {
+            finalPath.insertAt(0, currentPathTile)
+            currentPathTile = currentPathTile.pathParent
+        }
     }
-/*
-    d) for each successor
-        i) if successor is the goal, stop search
-          successor.g = q.g + distance between
-                              successor and q
-          successor.h = distance from goal to
-          successor (This can be done using many
-          ways, we will discuss three heuristics-
-          Manhattan, Diagonal and Euclidean
-          Heuristics)
-
-          successor.f = successor.g + successor.h
-
-        ii) if a node with the same position as
-            successor is in the OPEN list which has a
-           lower f than successor, skip this successor
-
-        iii) if a node with the same position as
-            successor  is in the CLOSED list which has
-            a lower f than successor, skip this successor
-            otherwise, add  the node to the open list
-     end (for loop)
-
-    e) push q on the closed list
-    end (while loop)*/
     return finalPath
 }
-function findShortestPathTile(openTiles:Array<PathPosition>):PathPosition{
-    let shortestPath:PathPosition = null
+function findShortestPathTile(openTiles: Array<PathPosition>): PathPosition {
+    let shortestPath: PathPosition = null
     openTiles.forEach(function (value: PathPosition, index: number) {
-        if(shortestPath != null){
-            if(value.findTotalDistance() < shortestPath.findTotalDistance()){
+        if (shortestPath != null) {
+            if (value.findTotalDistance() < shortestPath.findTotalDistance()) {
                 shortestPath = value
             }
-        } else{
+        } else {
             shortestPath = value
         }
     })
     return shortestPath
 }
-function getSurroundingPathTiles(tile:PathPosition):Array<PathPosition>{
+function getSurroundingPathTiles(tile: PathPosition): Array<PathPosition> {
     let results = []
     let levelWidth = 32 //todo: actually calculate the size
     let levelHeight = 32 //todo: actually calculate the size
-    if(tile.point.y - tileSize > 0){
+    if (tile.point.y - tileSize > 0) {
         results.push(new PathPosition(new Point(tile.point.x, tile.point.y - tileSize)))
     }
     if (tile.point.x + tileSize <= levelWidth * tileSize) {
@@ -595,7 +583,7 @@ function getSurroundingPathTiles(tile:PathPosition):Array<PathPosition>{
 
     return results
 }
-function findSharkMovePosition(sharkPosition: Point, seekPath:Array<Point>):Point{
+function findSharkMovePosition(sharkPosition: Point, seekPath: Array<Point>): Point {
 
     //need to keep track of tile position of player and only recalculate if the player has changed tiles
 
@@ -603,7 +591,7 @@ function findSharkMovePosition(sharkPosition: Point, seekPath:Array<Point>):Poin
 }
 function findSharkTargetTile(playerPosition: Point): Point {
     let resultGridSpot = new Point()
-    if(isWaterTile(playerPosition.tile)){
+    if (isWaterTile(playerPosition.tile)) {
         resultGridSpot.y = playerPosition.y
         resultGridSpot.x = playerPosition.x
         return resultGridSpot
@@ -612,20 +600,22 @@ function findSharkTargetTile(playerPosition: Point): Point {
 
     return resultGridSpot
 }
-function moveGameSprite(position:Point, sprite:Sprite):void {
+function moveGameSprite(position: Point, sprite: Sprite): void {
     sprite.x = Math.floor(position.x)
     sprite.y = Math.floor(position.y)
 }
 game.onUpdate(function () {
     playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
-// move octopus
+    // move octopus
     octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, hitBuffer)
-moveGameSprite(octopusPosition, octopus)
-// move shark
+    moveGameSprite(octopusPosition, octopus)
+    // move shark
     sharkTargetTile = findSharkTargetTile(playerPosition)
-if (sharkTargetTile.getColumn() > 0 && sharkTargetTile.getRow() > 0) {
+    if (sharkTargetTile.getColumn() > 0 && sharkTargetTile.getRow() > 0) {
         if (sharkSeekPath.length == 0 || !(sharkTargetTile.equals(sharkSeekPath[sharkSeekPath.length - 1].point))) {
-            sharkSeekPath = seekPath(sharkPosition, sharkTargetTile, [], [])
+            sharkSeekPath = seekPath(sharkPosition, sharkTargetTile)
+            console.log(sharkSeekPath)
         }
     }
 })
+ 
