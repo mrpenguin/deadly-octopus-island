@@ -481,6 +481,7 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
 }
 function seekPath(startingTile: Point, targetTile: Point): Array<PathPosition> {
     let shortestPathTile: PathPosition = null
+    let targetPathPosition: PathPosition = new PathPosition(targetTile)
     let finalPathTile: PathPosition = null
     let isValidTile: boolean = true
     let finalPath: Array<PathPosition> = [] 
@@ -488,17 +489,14 @@ function seekPath(startingTile: Point, targetTile: Point): Array<PathPosition> {
     let closedTiles: Array<PathPosition> = []
     let i: number = 0
     let j: number = 0
-    console.log("open tiles")
-    console.log(openTiles)
     while (openTiles.length > 0) {
-        console.log("here")
         shortestPathTile = findShortestPathTile(openTiles)
         openTiles.removeElement(shortestPathTile)
         closedTiles.push(shortestPathTile)
         let surroundingTiles = getSurroundingPathTiles(shortestPathTile);
         for (i = 0; i < surroundingTiles.length; i++) {
             isValidTile = true
-            if (surroundingTiles[i].equalsPoint(targetTile)) {
+            if (surroundingTiles[i].equalsPathPosition(targetPathPosition)) {
                 surroundingTiles[i].pathParent = shortestPathTile
                 finalPathTile = surroundingTiles[i]
                 break
@@ -535,6 +533,7 @@ function seekPath(startingTile: Point, targetTile: Point): Array<PathPosition> {
                 }
 
                 surroundingTiles[i].pathParent = shortestPathTile
+                openTiles.push(surroundingTiles[i])
             }
             if (finalPathTile != null) {
                 break
