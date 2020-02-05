@@ -244,8 +244,9 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     otherSprite.destroy()
 })
 let sharkSeekPath: Array<PathPosition> = []
-let hitBuffer = 4
-let tileSize = 8
+const hitBuffer = 4
+const tileSize = 8
+const playerMoveSpeed = 40
 class Point {
     x: number
     y: number
@@ -489,7 +490,10 @@ function seekPath(startingTile: Point, targetTile: Point): Array<PathPosition> {
     let closedTiles: Array<PathPosition> = []
     let i: number = 0
     let j: number = 0
+    let count: number = 0
     while (openTiles.length > 0) {
+        console.log("count " + count)
+        count++
         shortestPathTile = findShortestPathTile(openTiles)
         openTiles.removeElement(shortestPathTile)
         closedTiles.push(shortestPathTile)
@@ -499,6 +503,7 @@ function seekPath(startingTile: Point, targetTile: Point): Array<PathPosition> {
             if (surroundingTiles[i].equalsPathPosition(targetPathPosition)) {
                 surroundingTiles[i].pathParent = shortestPathTile
                 finalPathTile = surroundingTiles[i]
+                console.log("here")
                 break
             } else {
                 //search open tiles
@@ -538,6 +543,9 @@ function seekPath(startingTile: Point, targetTile: Point): Array<PathPosition> {
             if (finalPathTile != null) {
                 break
             }
+        }
+        if (finalPathTile != null) {
+            break
         }
     }
     if (finalPathTile != null) {
@@ -582,7 +590,7 @@ function getSurroundingPathTiles(tile: PathPosition): Array<PathPosition> {
 
     return results
 }
-function findSharkMovePosition(sharkPosition: Point, seekPath: Array<Point>): Point {
+function findSharkMovePosition(sharkPosition: Point, seekPath: Array<PathPosition>): Point {
 
     //need to keep track of tile position of player and only recalculate if the player has changed tiles
 
@@ -616,5 +624,7 @@ game.onUpdate(function () {
             console.log(sharkSeekPath)
         }
     }
+    sharkPosition = findSharkMovePosition(sharkPosition, sharkSeekPath)
+    moveGameSprite(sharkPosition, shark)
 })
  
