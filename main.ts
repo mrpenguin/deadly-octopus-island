@@ -1,3 +1,6 @@
+/// <reference path="HelperClasses.ts" />
+/// <reference path="Pathfinding.ts" />
+
 namespace myTiles {
     //% blockIdentity=images._tile
     export const tile0 = img`
@@ -250,57 +253,18 @@ namespace myTiles {
         b b b 5 5 b b b
     `
 }
+
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
-let sharkSeekPath: Array<PathPosition> = []
+let sharkSeekPath: Array<HelperClasses.PathPosition> = []
 let hitBuffer = 4
 let tileSize = 8
 let playerMoveSpeed = 40
-class Point {
-    x: number
-    y: number
-    tile: Image = null
-    constructor(x: number = 0, y: number = 0) {
-        this.x = x
-        this.y = y
-    }
-    getColumn(): number {
-        return Math.floor(this.x / tileSize);
-    }
-    getRow(): number {
-        return Math.floor(this.y / tileSize);
-    }
-    equals(otherPoint: Point): boolean {
-        return this.x === otherPoint.x && this.y === otherPoint.y
-    }
-}
-class PathPosition {
-    point: Point
-    distanceFromTarget: number
-    distanceFromParent: number
-    pathParent: PathPosition
-    constructor(point: Point) {
-        this.point = point
-    }
-    calculateDistance(otherPosition: PathPosition): number {
-        //using Manhattan calculation since shark can only move four directions
-        return Math.abs(otherPosition.point.x - this.point.x) + Math.abs(otherPosition.point.y - this.point.y)
-    }
-    equalsPathPosition(otherPathPosition: PathPosition): boolean {
-        return this.point.getColumn() === otherPathPosition.point.getColumn() && this.point.getRow() === otherPathPosition.point.getRow()
-    }
-    equalsPoint(otherPoint: Point): boolean {
-        return this.point.getColumn() === otherPoint.getColumn() && this.point.getRow() === otherPoint.getRow()
-    }
-    findTotalDistance(): number {
-        return this.distanceFromTarget + this.distanceFromParent
-    }
-}
-let playerPosition: Point = new Point(0, 0)
-let octopusPosition: Point = new Point(0, 0)
-let sharkPosition: Point = new Point(0, 0)
+let playerPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
+let octopusPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
+let sharkPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let mySprite = sprites.create(img`
     . . . . . . . .
     . . . 1 1 . . .
@@ -424,7 +388,7 @@ let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
 shark.x = sharkPosition.x = sharkSpawnTile.x
 shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
-let sharkTargetTile = new Point();
+let sharkTargetTile = new HelperClasses.Point();
 function positionToTile(position: number, tileSize: number): number {
     return Math.floor(position / tileSize);
 }
@@ -452,7 +416,7 @@ function isLandTile(tileImage: Image): boolean {
     }
     return false
 }
-function checkLandBoundsCollision(character: Sprite, lastPosition: Point): Point {
+function checkLandBoundsCollision(character: Sprite, lastPosition: HelperClasses.Point): HelperClasses.Point {
     let newTile: Image = tiles.getTileAt(positionToTile(character.x, tileSize), positionToTile(character.y, tileSize))
     if (lastPosition.tile == null) {
         lastPosition.tile = newTile
@@ -471,7 +435,7 @@ function checkLandBoundsCollision(character: Sprite, lastPosition: Point): Point
     lastPosition.tile = newTile
     return lastPosition
 }
-function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, buffer: number): Point {
+function findOctopusMovePosition(octopusPosition: HelperClasses.Point, playerPosition: HelperClasses.Point, buffer: number): HelperClasses.Point {
     let moveLeft: boolean = playerPosition.x < octopusPosition.x - buffer
     let moveRight: boolean = playerPosition.x > octopusPosition.x + buffer
     let moveUp: boolean = playerPosition.y < octopusPosition.y - buffer
@@ -490,124 +454,14 @@ function findOctopusMovePosition(octopusPosition: Point, playerPosition: Point, 
     }
     return octopusPosition
 }
-function seekPath(startingTile: Point, targetTile: Point): Array<PathPosition> {
-    let shortestPathTile: PathPosition = null
-    let targetPathPosition: PathPosition = new PathPosition(targetTile)
-    let finalPathTile: PathPosition = null
-    let isValidTile: boolean = true
-    let finalPath: Array<PathPosition> = [] 
-    let openTiles: Array<PathPosition> = [new PathPosition(startingTile)]
-    let closedTiles: Array<PathPosition> = []
-    let i: number = 0
-    let j: number = 0
-    let count: number = 0
-    while (openTiles.length > 0) {
-        console.log("count " + count)
-        count++
-        shortestPathTile = findShortestPathTile(openTiles)
-        openTiles.removeElement(shortestPathTile)
-        closedTiles.push(shortestPathTile)
-        let surroundingTiles = getSurroundingPathTiles(shortestPathTile);
-        for (i = 0; i < surroundingTiles.length; i++) {
-            isValidTile = true
-            if (surroundingTiles[i].equalsPathPosition(targetPathPosition)) {
-                surroundingTiles[i].pathParent = shortestPathTile
-                finalPathTile = surroundingTiles[i]
-                console.log("here")
-                break
-            } else {
-                //search open tiles
-                for (j = 0; j < openTiles.length; j++) {
-                    if (surroundingTiles[i].equalsPathPosition(openTiles[j])) {
-                        if (openTiles[j].findTotalDistance() > surroundingTiles[i].findTotalDistance()) {
-                            openTiles[j] = surroundingTiles[i] //replace current open tile with this one
-                        }
-                        isValidTile = false
-                        break
-                    }
-                }
-                if (!isValidTile) {
-                    continue
-                }
-                //search closed tiles
-                for (j = 0; j < closedTiles.length; j++) {
-                    if (surroundingTiles[i].equalsPathPosition(closedTiles[j])) {
-                        isValidTile = false
-                        break
-                    }
-                }
-                if (!isValidTile) {
-                    continue
-                }
-
-                //search map tile
-                surroundingTiles[i].point.tile = tiles.getTileAt(surroundingTiles[i].point.x, surroundingTiles[i].point.y)
-                if (isLandTile(surroundingTiles[i].point.tile)) {
-                    closedTiles.push(surroundingTiles[i])
-                    continue
-                }
-
-                surroundingTiles[i].pathParent = shortestPathTile
-                openTiles.push(surroundingTiles[i])
-            }
-            if (finalPathTile != null) {
-                break
-            }
-        }
-        if (finalPathTile != null) {
-            break
-        }
-    }
-    if (finalPathTile != null) {
-        //build final array
-        let currentPathTile: PathPosition = finalPathTile
-        while (currentPathTile != null) {
-            finalPath.insertAt(0, currentPathTile)
-            currentPathTile = currentPathTile.pathParent
-        }
-    }
-    return finalPath
-}
-function findShortestPathTile(openTiles: Array<PathPosition>): PathPosition {
-    let shortestPath: PathPosition = null
-    openTiles.forEach(function (value: PathPosition, index: number) {
-        if (shortestPath != null) {
-            if (value.findTotalDistance() < shortestPath.findTotalDistance()) {
-                shortestPath = value
-            }
-        } else {
-            shortestPath = value
-        }
-    })
-    return shortestPath
-}
-function getSurroundingPathTiles(tile: PathPosition): Array<PathPosition> {
-    let results = []
-    let levelWidth = 32 //todo: actually calculate the size
-    let levelHeight = 32 //todo: actually calculate the size
-    if (tile.point.y - tileSize > 0) {
-        results.push(new PathPosition(new Point(tile.point.x, tile.point.y - tileSize)))
-    }
-    if (tile.point.x + tileSize <= levelWidth * tileSize) {
-        results.push(new PathPosition(new Point(tile.point.x + tileSize, tile.point.y)))
-    }
-    if (tile.point.y + tileSize <= levelHeight * tileSize) {
-        results.push(new PathPosition(new Point(tile.point.x, tile.point.y + tileSize)))
-    }
-    if (tile.point.x - tileSize > 0) {
-        results.push(new PathPosition(new Point(tile.point.x - tileSize, tile.point.y)))
-    }
-
-    return results
-}
-function findSharkMovePosition(sharkPosition: Point, seekPath: Array<PathPosition>): Point {
+function findSharkMovePosition(sharkPosition: HelperClasses.Point, seekPath: Array<HelperClasses.PathPosition>): HelperClasses.Point {
 
     //need to keep track of tile position of player and only recalculate if the player has changed tiles
 
     return sharkPosition
 }
-function findSharkTargetTile(playerPosition: Point): Point {
-    let resultGridSpot = new Point()
+function findSharkTargetTile(playerPosition: HelperClasses.Point): HelperClasses.Point {
+    let resultGridSpot = new HelperClasses.Point()
     if (isWaterTile(playerPosition.tile)) {
         resultGridSpot.y = playerPosition.y
         resultGridSpot.x = playerPosition.x
@@ -617,7 +471,7 @@ function findSharkTargetTile(playerPosition: Point): Point {
 
     return resultGridSpot
 }
-function moveGameSprite(position: Point, sprite: Sprite): void {
+function moveGameSprite(position: HelperClasses.Point, sprite: Sprite): void {
     sprite.x = Math.floor(position.x)
     sprite.y = Math.floor(position.y)
 }
@@ -630,8 +484,7 @@ moveGameSprite(octopusPosition, octopus)
     sharkTargetTile = findSharkTargetTile(playerPosition)
 if (sharkTargetTile.getColumn() > 0 && sharkTargetTile.getRow() > 0) {
         if (sharkSeekPath.length == 0 || !(sharkTargetTile.equals(sharkSeekPath[sharkSeekPath.length - 1].point))) {
-            sharkSeekPath = seekPath(sharkPosition, sharkTargetTile)
-console.log(sharkSeekPath)
+            //sharkSeekPath = Pathfinding.seekPath(sharkPosition, sharkTargetTile)
         }
     }
     sharkPosition = findSharkMovePosition(sharkPosition, sharkSeekPath)
