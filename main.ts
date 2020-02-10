@@ -254,7 +254,10 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
+let i = 0
+let j = 0
 let sharkSeekPath: Array<HelperClasses.PathPosition> = []
+let waypoints: Array<HelperClasses.Waypoint> = []
 let hitBuffer = 4
 let tileSize = 8
 let playerMoveSpeed = 40
@@ -372,6 +375,23 @@ coinTiles.forEach(function (value: tiles.Location, index: number) {
     tiles.placeOnTile(newCoin, value)
     tiles.setTileAt(value, myTiles.tile4);
 })
+let waypointTiles = tiles.getTilesByType(myTiles.tile22)
+waypointTiles.forEach(function (value: tiles.Location, index: number) {
+    tiles.setTileAt(value, myTiles.tile2)
+    waypoints.push(new HelperClasses.Waypoint(new HelperClasses.Point(value.x, value.y)))
+})
+while (i > -1) {
+    j = i - 1
+    while (j > -1) {
+        if (waypoints[i].point.x == waypoints[j].point.x ||
+            waypoints[i].point.y == waypoints[j].point.y) {
+            //need to double check that there is no land in between
+            waypoints[i].connections.push(waypoints[j])
+            waypoints[j].connections.push(waypoints[i])
+        }
+    }
+
+}
 let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
 mySprite.x = playerPosition.x = playerSpawnTile.x
 mySprite.y = playerPosition.y = playerSpawnTile.y
@@ -384,7 +404,7 @@ let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
 shark.x = sharkPosition.x = sharkSpawnTile.x
 shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
-let sharkTargetTile = new HelperClasses.Point();
+let sharkTargetTile = new HelperClasses.Point()
 function positionToTile(position: number, tileSize: number): number {
     return Math.floor(position / tileSize);
 }
