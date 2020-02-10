@@ -1,6 +1,3 @@
-/// <reference path="HelperClasses.ts" />
-/// <reference path="Pathfinding.ts" />
-
 namespace myTiles {
     //% blockIdentity=images._tile
     export const tile0 = img`
@@ -253,7 +250,6 @@ namespace myTiles {
         b b b 5 5 b b b
     `
 }
-
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.setScore(info.score() + 1)
     otherSprite.destroy()
@@ -484,7 +480,7 @@ moveGameSprite(octopusPosition, octopus)
     sharkTargetTile = findSharkTargetTile(playerPosition)
 if (sharkTargetTile.getColumn() > 0 && sharkTargetTile.getRow() > 0) {
         if (sharkSeekPath.length == 0 || !(sharkTargetTile.equals(sharkSeekPath[sharkSeekPath.length - 1].point))) {
-            //sharkSeekPath = Pathfinding.seekPath(sharkPosition, sharkTargetTile)
+        	
         }
     }
     sharkPosition = findSharkMovePosition(sharkPosition, sharkSeekPath)
