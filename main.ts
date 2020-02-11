@@ -381,16 +381,29 @@ waypointTiles.forEach(function (value: tiles.Location, index: number) {
     waypoints.push(new HelperClasses.Waypoint(new HelperClasses.Point(value.x, value.y)))
 })
 while (i > -1) {
+    let validConnection = false
     j = i - 1
     while (j > -1) {
+        validConnection = false
         if (waypoints[i].point.x == waypoints[j].point.x ||
             waypoints[i].point.y == waypoints[j].point.y) {
+            validConnection = true
             //need to double check that there is no land in between
+            let connectingTiles = getTilesBetweenPoints(waypoints[i].point, waypoints[j].point)
+
+        }
+        if (validConnection) {
             waypoints[i].connections.push(waypoints[j])
             waypoints[j].connections.push(waypoints[i])
         }
+        j--
     }
+    i--
+}
+function getTilesBetweenPoints(point1:HelperClasses.Point, point2:HelperClasses.Point):Array<tiles.Tile>{
+    let tiles:Array<tiles.Tile> = []
 
+    return tiles
 }
 let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
 mySprite.x = playerPosition.x = playerSpawnTile.x
