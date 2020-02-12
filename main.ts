@@ -258,9 +258,9 @@ let i = 0
 let j = 0
 let sharkSeekPath: Array<HelperClasses.PathPosition> = []
 let waypoints: Array<HelperClasses.Waypoint> = []
-let hitBuffer = 4
-let tileSize = 8
-let playerMoveSpeed = 40
+const HIT_BUFFER = 4
+const TILE_SIZE = 8
+const PLAYER_MOVE_SPEED = 40
 let playerPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let octopusPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let sharkPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
@@ -389,7 +389,7 @@ while (i > -1) {
             waypoints[i].point.y == waypoints[j].point.y) {
             validConnection = true
             //need to double check that there is no land in between
-            let connectingTiles = getTilesBetweenPoints(waypoints[i].point, waypoints[j].point)
+            let connectingTiles = getTilesBetweenPoints(waypoints[i].point, waypoints[j].point, TILE_SIZE)
 
         }
         if (validConnection) {
@@ -400,9 +400,18 @@ while (i > -1) {
     }
     i--
 }
-function getTilesBetweenPoints(point1:HelperClasses.Point, point2:HelperClasses.Point):Array<tiles.Tile>{
+function getTilesBetweenPoints(point1:HelperClasses.Point, point2:HelperClasses.Point, tilesize:number):Array<tiles.Tile>{
     let tiles:Array<tiles.Tile> = []
-
+    let currentX = 0
+    let currentY = 0
+    if(point1.x == point2.x){
+        currentY = Math.min(point1.y, point2.y);
+        currentX = point1.x
+    }
+    if (point1.y == point2.y) {
+        currentY = point1.y;
+        currentX = Math.min(point1.y, point2.y);
+    }
     return tiles
 }
 let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
@@ -446,7 +455,7 @@ function isLandTile(tileImage: Image): boolean {
     return false
 }
 function checkLandBoundsCollision(character: Sprite, lastPosition: HelperClasses.Point): HelperClasses.Point {
-    let newTile: Image = tiles.getTileAt(positionToTile(character.x, tileSize), positionToTile(character.y, tileSize))
+    let newTile: Image = tiles.getTileAt(positionToTile(character.x, TILE_SIZE), positionToTile(character.y, TILE_SIZE))
     if (lastPosition.tile == null) {
         lastPosition.tile = newTile
     }
@@ -507,7 +516,7 @@ function moveGameSprite(position: HelperClasses.Point, sprite: Sprite): void {
 game.onUpdate(function () {
     playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
 // move octopus
-    octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, hitBuffer)
+    octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, HIT_BUFFER)
 moveGameSprite(octopusPosition, octopus)
 // move shark
     sharkTargetTile = findSharkTargetTile(playerPosition)

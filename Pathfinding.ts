@@ -98,17 +98,17 @@ namespace Pathfinding{
         let results = []
         let levelWidth = 32 //todo: actually calculate the size
         let levelHeight = 32 //todo: actually calculate the size
-        if (tile.point.y - tileSize > 0) {
-            results.push(new HelperClasses.PathPosition(new HelperClasses.Point(tile.point.x, tile.point.y - tileSize)))
+        if (tile.point.y - TILE_SIZE > 0) {
+            results.push(new HelperClasses.PathPosition(new HelperClasses.Point(tile.point.x, tile.point.y - TILE_SIZE)))
         }
-        if (tile.point.x + tileSize <= levelWidth * tileSize) {
-            results.push(new HelperClasses.PathPosition(new HelperClasses.Point(tile.point.x + tileSize, tile.point.y)))
+        if (tile.point.x + TILE_SIZE <= levelWidth * TILE_SIZE) {
+            results.push(new HelperClasses.PathPosition(new HelperClasses.Point(tile.point.x + TILE_SIZE, tile.point.y)))
         }
-        if (tile.point.y + tileSize <= levelHeight * tileSize) {
-            results.push(new HelperClasses.PathPosition(new HelperClasses.Point(tile.point.x, tile.point.y + tileSize)))
+        if (tile.point.y + TILE_SIZE <= levelHeight * TILE_SIZE) {
+            results.push(new HelperClasses.PathPosition(new HelperClasses.Point(tile.point.x, tile.point.y + TILE_SIZE)))
         }
-        if (tile.point.x - tileSize > 0) {
-            results.push(new HelperClasses.PathPosition(new HelperClasses.Point(tile.point.x - tileSize, tile.point.y)))
+        if (tile.point.x - TILE_SIZE > 0) {
+            results.push(new HelperClasses.PathPosition(new HelperClasses.Point(tile.point.x - TILE_SIZE, tile.point.y)))
         }
 
         return results

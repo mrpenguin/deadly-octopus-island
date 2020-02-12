@@ -10,10 +10,10 @@ namespace HelperClasses{
             this.y = y
         }
         getColumn(): number {
-            return Math.floor(this.x / tileSize);
+            return Math.floor(this.x / TILE_SIZE);
         }
         getRow(): number {
-            return Math.floor(this.y / tileSize);
+            return Math.floor(this.y / TILE_SIZE);
         }
         equals(otherPoint: Point): boolean {
             return this.x === otherPoint.x && this.y === otherPoint.y
