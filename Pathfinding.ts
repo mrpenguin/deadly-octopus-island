@@ -113,4 +113,72 @@ namespace Pathfinding{
 
         return results
     }
+    export function getTilesBetweenPoints(point1: HelperClasses.Point, point2: HelperClasses.Point, tilesize: number): Array<Image> {
+        const returnTiles: Array<Image> = []
+        let currentX = 0
+        let currentY = 0
+        let target = 0
+        if (point1.x == point2.x) {
+            currentY = Math.min(point1.y, point2.y) + tilesize
+            target = Math.max(point1.y, point2.y)
+            currentX = point1.x
+            while (currentY < target) {
+                returnTiles.push(tiles.getTileAt(currentX, currentY))
+                currentY += tilesize
+            }
+        }
+        if (point1.y == point2.y) {
+            currentY = point1.y;
+            currentX = Math.min(point1.x, point2.x) + tilesize
+            target = Math.max(point1.x, point2.x)
+            while (currentX < target) {
+                returnTiles.push(tiles.getTileAt(currentX, currentY))
+                currentX += tilesize
+            }
+        }
+        return returnTiles
+    }
+    export function connectWaypoints(waypoints: Array<HelperClasses.Waypoint>): Array<HelperClasses.Waypoint> {
+        let i = 0
+        let j = 0
+        while (i > -1) {
+            let validConnection = false
+            j = i - 1
+            while (j > -1) {
+                validConnection = false
+                if (waypoints[i].point.x == waypoints[j].point.x ||
+                    waypoints[i].point.y == waypoints[j].point.y) {
+                    validConnection = true
+                    //need to double check that there is no land in between
+                    let connectingTiles = getTilesBetweenPoints(waypoints[i].point, waypoints[j].point, TILE_SIZE)
+                    connectingTiles.forEach(function (value: Image, index: number) {
+                        if (validConnection) {
+                            if (isLandTile(value)) {
+                                validConnection = false
+                            }
+                        }
+                    })
+                }
+                if (validConnection) {
+                    waypoints[i].connections.push(waypoints[j])
+                    waypoints[j].connections.push(waypoints[i])
+                }
+                j--
+            }
+            i--
+        }
+        return waypoints
+    }
+
+    export function getClosestWaypoint(point:HelperClasses.Point, waypoints:Array<HelperClasses.Waypoint>):HelperClasses.Waypoint{
+        let currentScore = 100000
+        let closestWaypoint:HelperClasses.Waypoint = null
+        waypoints.forEach(function (value: HelperClasses.Waypoint, index: number) {
+            if(value.getDistanceFrom(point) < currentScore){
+                currentScore = value.getDistanceFrom(point)
+                closestWaypoint = value
+            }
+        })
+        return closestWaypoint
+    }
 }

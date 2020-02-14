@@ -27,6 +27,10 @@ namespace HelperClasses{
         constructor(point: Point){
             this.point = point
         }
+
+        getDistanceFrom(otherPoint: Point): number {
+            return Math.abs(otherPoint.x - this.point.x) + Math.abs(otherPoint.y - this.point.y)
+        }
     }
     
     export class PathPosition {

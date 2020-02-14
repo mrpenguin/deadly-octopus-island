@@ -254,11 +254,13 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
-let sharkSeekPath: Array<HelperClasses.PathPosition> = []
+let sharkTargetWaypoint:HelperClasses.Waypoint = null
+let playerInWater:boolean = false
+let sharkSeekPath: number[] = []
 let waypoints: Array<HelperClasses.Waypoint> = []
-const HIT_BUFFER = 4
-const TILE_SIZE = 8
-const PLAYER_MOVE_SPEED = 40
+let HIT_BUFFER = 4
+let TILE_SIZE = 8
+let PLAYER_MOVE_SPEED = 40
 let playerPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let octopusPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let sharkPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
@@ -329,7 +331,7 @@ let coin = sprites.create(img`
 controller.moveSprite(mySprite)
 scene.cameraFollowSprite(mySprite)
 tiles.setTilemap(tiles.createTilemap(
-            hex`2000200001010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010110010101010101010101010101010101010101010101010101110101010101010101010101010101010101010101010101010101010101010101010101010101010115010101010101010101010101010101010101150101010101010101010101010101011313010101010101010101010101010101010101010101010101010101010102030303030303030303030303030314010101010101010101010101120101010203030303030303030303030303031401010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010102030304011501010101010101010101011501010101010101010101010101010203050401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102050304010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020305040101010101010101010101010101010101010101010101010101010102030304010101010101010101010101010101010101010101010101010101010205030401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102030504010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010101131301010101010101010101010101010101010101010101010101010115010101010101150101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101`,
+            hex`2000200001010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010110010101010101010101010101010101010101010101010101110101010101010101010101010101010101010101010101010101010101010101010101010101010115010101010101010101010101010101010101150101010101010101010101010101011313010101010101010101010101010101010101010101010101010101010102030303030303030303030303030314010101010101010101010101010101010203030303030303030303030303031401010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101120102030304011501010101010101010101011501010101010101010101010101010203050401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102050304010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020305040101010101010101010101010101010101010101010101010101010102030304010101010101010101010101010101010101010101010101010101010205030401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102030504010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010101131301010101010101010101010101010101010101010101010101010115010101010101150101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101`,
             img`
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -378,63 +380,7 @@ waypointTiles.forEach(function (value: tiles.Location, index: number) {
     tiles.setTileAt(value, myTiles.tile2)
     waypoints.push(new HelperClasses.Waypoint(new HelperClasses.Point(value.x, value.y)))
 })
-waypoints = connectWaypoints(waypoints)
-function getTilesBetweenPoints(point1: HelperClasses.Point, point2: HelperClasses.Point, tilesize: number): Array<Image> {
-    const returnTiles: Array<Image> = []
-    let currentX = 0
-    let currentY = 0
-    let target = 0
-    if (point1.x == point2.x) {
-        currentY = Math.min(point1.y, point2.y) + tilesize
-        target = Math.max(point1.y, point2.y)
-        currentX = point1.x
-        while (currentY < target) {
-            returnTiles.push(tiles.getTileAt(currentX, currentY))
-            currentY += tilesize
-        }
-    }
-    if (point1.y == point2.y) {
-        currentY = point1.y;
-        currentX = Math.min(point1.x, point2.x) + tilesize
-        target = Math.max(point1.x, point2.x)
-        while (currentX < target) {
-            returnTiles.push(tiles.getTileAt(currentX, currentY))
-            currentX += tilesize
-        }
-    }
-    return returnTiles
-}
-function connectWaypoints(waypoints: Array<HelperClasses.Waypoint>):Array<HelperClasses.Waypoint> {
-    let i = 0
-    let j = 0
-    while (i > -1) {
-        let validConnection = false
-        j = i - 1
-        while (j > -1) {
-            validConnection = false
-            if (waypoints[i].point.x == waypoints[j].point.x ||
-                waypoints[i].point.y == waypoints[j].point.y) {
-                validConnection = true
-                //need to double check that there is no land in between
-                let connectingTiles = getTilesBetweenPoints(waypoints[i].point, waypoints[j].point, TILE_SIZE)
-                connectingTiles.forEach(function (value: Image, index: number) {
-                    if (validConnection) {
-                        if (isLandTile(value)) {
-                            validConnection = false
-                        }
-                    }
-                })
-            }
-            if (validConnection) {
-                waypoints[i].connections.push(waypoints[j])
-                waypoints[j].connections.push(waypoints[i])
-            }
-            j--
-        }
-        i--
-    }
-    return waypoints
-}
+waypoints = Pathfinding.connectWaypoints(waypoints)
 let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
 mySprite.x = playerPosition.x = playerSpawnTile.x
 mySprite.y = playerPosition.y = playerSpawnTile.y
@@ -536,16 +482,27 @@ function moveGameSprite(position: HelperClasses.Point, sprite: Sprite): void {
 }
 game.onUpdate(function () {
     playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
+playerInWater = isWaterTile(playerPosition.tile)
 // move octopus
     octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, HIT_BUFFER)
 moveGameSprite(octopusPosition, octopus)
-// move shark
-    sharkTargetTile = findSharkTargetTile(playerPosition)
-if (sharkTargetTile.getColumn() > 0 && sharkTargetTile.getRow() > 0) {
-        if (sharkSeekPath.length == 0 || !(sharkTargetTile.equals(sharkSeekPath[sharkSeekPath.length - 1].point))) {
-        	
-        }
+// move shark sharkTargetTile =
+    // findSharkTargetTile(playerPosition) if
+    // (sharkTargetTile.getColumn() > 0 &&
+    // sharkTargetTile.getRow() > 0) { if
+    // (sharkSeekPath.length == 0 ||
+    // !(sharkTargetTile.equals(sharkSeekPath[sharkSeekPath.length
+    // - 1].point))) {
+    //
+    // } } sharkPosition =
+    // findSharkMovePosition(sharkPosition, sharkSeekPath)
+    if (sharkTargetWaypoint == null) {
+        sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
     }
-    sharkPosition = findSharkMovePosition(sharkPosition, sharkSeekPath)
-moveGameSprite(sharkPosition, shark)
+    //if shark is close
+    //target player
+    //if shark is far
+    //pathfind closest waypoint
+    //once at waypoint determine next waypoint based on player in water or on land
+    moveGameSprite(sharkPosition, shark)
 })
