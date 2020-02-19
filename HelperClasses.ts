@@ -4,6 +4,7 @@ namespace HelperClasses{
     export class Point {
         x: number
         y: number
+        remainder: number
         tile: Image = null
         constructor(x: number = 0, y: number = 0) {
             this.x = x

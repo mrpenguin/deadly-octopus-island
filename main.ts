@@ -480,6 +480,21 @@ function moveGameSprite(position: HelperClasses.Point, sprite: Sprite): void {
     sprite.x = Math.floor(position.x)
     sprite.y = Math.floor(position.y)
 }
+function moveTowardWaypoint(position: HelperClasses.Point, waypoint: HelperClasses.Waypoint, moveRate:number):HelperClasses.Point{
+    if(position.x < waypoint.point.x){
+        
+    }
+    if(position.x > waypoint.point.x){
+
+    }
+    if(position.y < waypoint.point.y){
+
+    }
+    if(position.y > waypoint.point.y){
+
+    }
+    return position
+}
 game.onUpdate(function () {
     playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
 playerInWater = isWaterTile(playerPosition.tile)
@@ -496,13 +511,15 @@ moveGameSprite(octopusPosition, octopus)
     //
     // } } sharkPosition =
     // findSharkMovePosition(sharkPosition, sharkSeekPath)
-    if (sharkTargetWaypoint == null) {
-        sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
-    }
+
     //if shark is close
     //target player
     //if shark is far
     //pathfind closest waypoint
+    if (sharkTargetWaypoint == null) {
+        sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
+    }
+
     //once at waypoint determine next waypoint based on player in water or on land
     moveGameSprite(sharkPosition, shark)
 })
