@@ -482,16 +482,32 @@ function moveGameSprite(position: HelperClasses.Point, sprite: Sprite): void {
 }
 function moveTowardWaypoint(position: HelperClasses.Point, waypoint: HelperClasses.Waypoint, moveRate:number):HelperClasses.Point{
     if(position.x < waypoint.point.x){
-        
+        position.x += moveRate
+        if(position.x > waypoint.point.x){
+            position.remainder = position.x - waypoint.point.x
+            position.x = waypoint.point.x
+        }
     }
     if(position.x > waypoint.point.x){
-
+        position.x -= moveRate
+        if (position.x < waypoint.point.x) {
+            position.remainder = waypoint.point.x - position.x
+            position.x = waypoint.point.x
+        }
     }
     if(position.y < waypoint.point.y){
-
+        position.y += moveRate
+        if (position.y > waypoint.point.y) {
+            position.remainder = position.y - waypoint.point.y
+            position.y = waypoint.point.y
+        }
     }
-    if(position.y > waypoint.point.y){
-
+    if (position.y > waypoint.point.y) {
+        position.y -= moveRate
+        if (position.y < waypoint.point.y) {
+            position.remainder = waypoint.point.y - position.y
+            position.y = waypoint.point.y
+        }
     }
     return position
 }
@@ -511,15 +527,13 @@ moveGameSprite(octopusPosition, octopus)
     //
     // } } sharkPosition =
     // findSharkMovePosition(sharkPosition, sharkSeekPath)
-
-    //if shark is close
-    //target player
-    //if shark is far
-    //pathfind closest waypoint
+    // if shark is close target player if shark is far
+    // pathfind closest waypoint
     if (sharkTargetWaypoint == null) {
         sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
     }
-
-    //once at waypoint determine next waypoint based on player in water or on land
+    moveTowardWaypoint(sharkPosition, sharkTargetWaypoint, PLAYER_MOVE_SPEED)
+// once at waypoint determine next waypoint based on
+    // player in water or on land
     moveGameSprite(sharkPosition, shark)
 })
