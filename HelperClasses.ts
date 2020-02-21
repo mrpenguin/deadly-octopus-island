@@ -32,6 +32,23 @@ namespace HelperClasses{
         getDistanceFrom(otherPoint: Point): number {
             return Math.abs(otherPoint.x - this.point.x) + Math.abs(otherPoint.y - this.point.y)
         }
+
+        getRandomConnection(waypointsToAvoid:Array<Waypoint>):Waypoint{
+            let result:Waypoint = null
+            let connectionClone = this.connections.slice()
+            let resultIndex = -1
+            while (result == null && connectionClone.length > 0) {
+                resultIndex = Math.floor(Math.randomRange(0, connectionClone.length))
+                result = this.connections[resultIndex]
+                connectionClone.splice(resultIndex, 1)
+                if(!waypointsToAvoid.find(r => r === result)){
+                    return result
+                } else{
+                    result = null
+                }
+            }
+            return result
+        }
     }
     
     export class PathPosition {

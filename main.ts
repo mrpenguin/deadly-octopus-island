@@ -254,7 +254,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
-let sharkTargetWaypoint:HelperClasses.Waypoint = null
+let sharkTargetWaypoint: HelperClasses.Waypoint = null
+let sharkPreviousWaypoint: HelperClasses.Waypoint = null
 let playerInWater:boolean = false
 let sharkSeekPath: number[] = []
 let waypoints: Array<HelperClasses.Waypoint> = []
@@ -532,7 +533,13 @@ moveGameSprite(octopusPosition, octopus)
     if (sharkTargetWaypoint == null) {
         sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
     }
-    moveTowardWaypoint(sharkPosition, sharkTargetWaypoint, PLAYER_MOVE_SPEED)
+    moveTowardWaypoint(sharkPosition, sharkTargetWaypoint, 1.25)
+    if(sharkPosition.equals(sharkTargetWaypoint.point)){
+        let holding = sharkTargetWaypoint
+        sharkTargetWaypoint = sharkTargetWaypoint.getRandomConnection(sharkPreviousWaypoint === null ? [] : [sharkPreviousWaypoint])
+        console.log(sharkTargetWaypoint.point)
+        sharkPreviousWaypoint = holding
+    }
 // once at waypoint determine next waypoint based on
     // player in water or on land
     moveGameSprite(sharkPosition, shark)
