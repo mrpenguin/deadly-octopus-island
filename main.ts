@@ -533,11 +533,10 @@ moveGameSprite(octopusPosition, octopus)
     if (sharkTargetWaypoint == null) {
         sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
     }
-    moveTowardWaypoint(sharkPosition, sharkTargetWaypoint, 1.25)
+    moveTowardWaypoint(sharkPosition, sharkTargetWaypoint, 1.85)
     if(sharkPosition.equals(sharkTargetWaypoint.point)){
         let holding = sharkTargetWaypoint
         sharkTargetWaypoint = sharkTargetWaypoint.getRandomConnection(sharkPreviousWaypoint === null ? [] : [sharkPreviousWaypoint])
-        console.log(sharkTargetWaypoint.point)
         sharkPreviousWaypoint = holding
     }
 // once at waypoint determine next waypoint based on

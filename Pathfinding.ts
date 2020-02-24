@@ -139,7 +139,7 @@ namespace Pathfinding{
         return returnTiles
     }
     export function connectWaypoints(waypoints: Array<HelperClasses.Waypoint>): Array<HelperClasses.Waypoint> {
-        let i = 0
+        let i = waypoints.length - 1
         let j = 0
         while (i > -1) {
             let validConnection = false

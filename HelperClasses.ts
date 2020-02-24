@@ -35,9 +35,10 @@ namespace HelperClasses{
 
         getRandomConnection(waypointsToAvoid:Array<Waypoint>):Waypoint{
             let result:Waypoint = null
+            console.log("connections " + this.connections.length)
             let connectionClone = this.connections.slice()
             let resultIndex = -1
-            while (result == null && connectionClone.length > 0) {
+            while (result === null && connectionClone.length > 0) {
                 resultIndex = Math.floor(Math.randomRange(0, connectionClone.length))
                 result = this.connections[resultIndex]
                 connectionClone.splice(resultIndex, 1)
