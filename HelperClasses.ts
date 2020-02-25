@@ -35,14 +35,14 @@ namespace HelperClasses{
 
         getRandomConnection(waypointsToAvoid:Array<Waypoint>):Waypoint{
             let result:Waypoint = null
-            console.log("connections " + this.connections.length)
-            let connectionClone = this.connections.slice()
+            let connectionClone:Array<HelperClasses.Waypoint> = this.connections.slice()
             let resultIndex = -1
             while (result === null && connectionClone.length > 0) {
-                resultIndex = Math.floor(Math.randomRange(0, connectionClone.length))
+                resultIndex = Math.floor(Math.randomRange(0, connectionClone.length - 1))
+                console.log(this.point.x + " " + this.point.y + " " + connectionClone.length + " " + resultIndex)
                 result = this.connections[resultIndex]
                 connectionClone.splice(resultIndex, 1)
-                if(!waypointsToAvoid.find(r => r === result)){
+                if(!waypointsToAvoid.find(r => r.point.equals(result.point))){
                     return result
                 } else{
                     result = null
