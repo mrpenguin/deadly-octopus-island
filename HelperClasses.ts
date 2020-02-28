@@ -39,11 +39,7 @@ namespace HelperClasses{
             let resultIndex = -1
             while (result === null && connectionClone.length > 0) {
                 resultIndex = Math.floor(Math.randomRange(0, connectionClone.length - 1))
-                console.log(this.point.x + " " + this.point.y + " " + resultIndex)
-                if(waypointsToAvoid.length > 0){
-                    console.log(waypointsToAvoid[0].point.x + " " + waypointsToAvoid[0].point.y);
-                }
-                result = this.connections[resultIndex]
+                result = connectionClone[resultIndex]
                 connectionClone.splice(resultIndex, 1)
                 if(!waypointsToAvoid.find(r => r.point.equals(result.point))){
                     return result
@@ -51,7 +47,6 @@ namespace HelperClasses{
                     result = null
                 }
             }
-            console.log("here")
             return this.connections[0] //failsafe in case everything goes wrong
         }
     }
