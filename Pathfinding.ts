@@ -1,7 +1,7 @@
 // Add your code here
 namespace Pathfinding{
 
-    export function seekPath(startingTile: HelperClasses.Point, targetTile: HelperClasses.Point): Array<HelperClasses.PathPosition> {
+    export function seekPath(startingTile: HelperClasses.Point, targetTile: HelperClasses.Point, maxIterations:number): Array<HelperClasses.PathPosition> {
         let shortestPathTile: HelperClasses.PathPosition = null
         let targetPathPosition: HelperClasses.PathPosition = new HelperClasses.PathPosition(targetTile)
         let finalPathTile: HelperClasses.PathPosition = null
@@ -11,10 +11,7 @@ namespace Pathfinding{
         let closedTiles: Array<HelperClasses.PathPosition> = []
         let i: number = 0
         let j: number = 0
-        let count: number = 0
-        while (openTiles.length > 0) {
-            console.log("count " + count)
-            count++
+        while (openTiles.length > 0 && maxIterations > -1) {
             shortestPathTile = findShortestPathTile(openTiles)
             openTiles.removeElement(shortestPathTile)
             closedTiles.push(shortestPathTile)
@@ -68,6 +65,7 @@ namespace Pathfinding{
             if (finalPathTile != null) {
                 break
             }
+            maxIterations--
         }
         if (finalPathTile != null) {
             //build final array

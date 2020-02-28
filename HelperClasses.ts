@@ -19,6 +19,10 @@ namespace HelperClasses{
         equals(otherPoint: Point): boolean {
             return this.x === otherPoint.x && this.y === otherPoint.y
         }
+        calculateDistance(otherPoint: Point): number {
+            //using Manhattan calculation since shark can only move four directions
+            return Math.abs(otherPoint.x - this.x) + Math.abs(otherPoint.y - this.y)
+        }
     }
 
     export class Waypoint {
@@ -30,7 +34,7 @@ namespace HelperClasses{
         }
 
         getDistanceFrom(otherPoint: Point): number {
-            return Math.abs(otherPoint.x - this.point.x) + Math.abs(otherPoint.y - this.point.y)
+            return this.point.calculateDistance(otherPoint)
         }
 
         getRandomConnection(waypointsToAvoid:Array<Waypoint>):Waypoint{
@@ -61,7 +65,7 @@ namespace HelperClasses{
         }
         calculateDistance(otherPosition: PathPosition): number {
             //using Manhattan calculation since shark can only move four directions
-            return Math.abs(otherPosition.point.x - this.point.x) + Math.abs(otherPosition.point.y - this.point.y)
+            return this.point.calculateDistance(otherPosition.point)
         }
         equalsPathPosition(otherPathPosition: PathPosition): boolean {
             return this.point.getColumn() === otherPathPosition.point.getColumn() && this.point.getRow() === otherPathPosition.point.getRow()

@@ -257,7 +257,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSpr
 let sharkTargetWaypoint: HelperClasses.Waypoint = null
 let sharkPreviousWaypoint: HelperClasses.Waypoint = null
 let playerInWater:boolean = false
-let sharkSeekPath: number[] = []
+let sharkSeekPath: Array<HelperClasses.PathPosition> = []
 let waypoints: Array<HelperClasses.Waypoint> = []
 let HIT_BUFFER = 4
 let TILE_SIZE = 8
@@ -481,33 +481,33 @@ function moveGameSprite(position: HelperClasses.Point, sprite: Sprite): void {
     sprite.x = Math.floor(position.x)
     sprite.y = Math.floor(position.y)
 }
-function moveTowardWaypoint(position: HelperClasses.Point, waypoint: HelperClasses.Waypoint, moveRate:number):HelperClasses.Point{
-    if(position.x < waypoint.point.x){
+function moveTowardPoint(position: HelperClasses.Point, point: HelperClasses.Point, moveRate:number):HelperClasses.Point{
+    if(position.x < point.x){
         position.x += moveRate
-        if(position.x > waypoint.point.x){
-            position.remainder = position.x - waypoint.point.x
-            position.x = waypoint.point.x
+        if(position.x > point.x){
+            position.remainder = position.x - point.x
+            position.x = point.x
         }
     }
-    if(position.x > waypoint.point.x){
+    if(position.x > point.x){
         position.x -= moveRate
-        if (position.x < waypoint.point.x) {
-            position.remainder = waypoint.point.x - position.x
-            position.x = waypoint.point.x
+        if (position.x < point.x) {
+            position.remainder = point.x - position.x
+            position.x = point.x
         }
     }
-    if(position.y < waypoint.point.y){
+    if(position.y < point.y){
         position.y += moveRate
-        if (position.y > waypoint.point.y) {
-            position.remainder = position.y - waypoint.point.y
-            position.y = waypoint.point.y
+        if (position.y > point.y) {
+            position.remainder = position.y - point.y
+            position.y = point.y
         }
     }
-    if (position.y > waypoint.point.y) {
+    if (position.y > point.y) {
         position.y -= moveRate
-        if (position.y < waypoint.point.y) {
-            position.remainder = waypoint.point.y - position.y
-            position.y = waypoint.point.y
+        if (position.y < point.y) {
+            position.remainder = point.y - position.y
+            position.y = point.y
         }
     }
     return position
@@ -530,16 +530,24 @@ moveGameSprite(octopusPosition, octopus)
     // findSharkMovePosition(sharkPosition, sharkSeekPath)
     // if shark is close target player if shark is far
     // pathfind closest waypoint
-    if (sharkTargetWaypoint == null) {
-        sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
-    }
-    moveTowardWaypoint(sharkPosition, sharkTargetWaypoint, 1.85)
-    if(sharkPosition.equals(sharkTargetWaypoint.point)){
-        let holding = sharkTargetWaypoint
-        sharkTargetWaypoint = sharkTargetWaypoint.getRandomConnection(sharkPreviousWaypoint === null ? [] : [sharkPreviousWaypoint])
-        sharkPreviousWaypoint = holding
+    
+    if(sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 5){
+        sharkTargetTile = findSharkTargetTile(playerPosition)
+        sharkSeekPath = Pathfinding.seekPath(sharkPosition, playerPosition, 10)
+        console.log(sharkSeekPath.length)
+    } else {
+        if (sharkTargetWaypoint == null) {
+            sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
+        }
+        moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, 1.85)
+        if (sharkPosition.equals(sharkTargetWaypoint.point)) {
+            let holding = sharkTargetWaypoint
+            sharkTargetWaypoint = sharkTargetWaypoint.getRandomConnection(sharkPreviousWaypoint === null ? [] : [sharkPreviousWaypoint])
+            sharkPreviousWaypoint = holding
+        }
     }
 // once at waypoint determine next waypoint based on
     // player in water or on land
     moveGameSprite(sharkPosition, shark)
+    sharkPosition.remainder = 0
 })
