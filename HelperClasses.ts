@@ -53,6 +53,16 @@ namespace HelperClasses{
             }
             return this.connections[0] //failsafe in case everything goes wrong
         }
+
+        getClosestConnectionToPoint(point: Point):Waypoint{
+            let result:Waypoint = null
+            this.connections.forEach(function (value: HelperClasses.Waypoint, index: number) {
+                if(result === null || value.point.calculateDistance(point) < result.point.calculateDistance(point)){
+                    result = value
+                }
+            })
+            return result
+        }
     }
     
     export class PathPosition {

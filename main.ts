@@ -395,6 +395,7 @@ shark.x = sharkPosition.x = sharkSpawnTile.x
 shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
 let sharkTargetTile = new HelperClasses.Point()
+let sharkFollowsPlayer = false
 function positionToTile(position: number, tileSize: number): number {
     return Math.floor(position / tileSize);
 }
@@ -530,11 +531,15 @@ moveGameSprite(octopusPosition, octopus)
     // findSharkMovePosition(sharkPosition, sharkSeekPath)
     // if shark is close target player if shark is far
     // pathfind closest waypoint
-    
-    if(sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 5){
+    sharkFollowsPlayer = false
+    if(playerInWater && sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 5){
         sharkTargetTile = findSharkTargetTile(playerPosition)
         sharkSeekPath = Pathfinding.seekPath(sharkPosition, playerPosition, 10)
-        console.log(sharkSeekPath.length)
+        sharkFollowsPlayer = sharkSeekPath.length > 0
+    } 
+    
+    if(sharkFollowsPlayer){
+
     } else {
         if (sharkTargetWaypoint == null) {
             sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
@@ -542,12 +547,17 @@ moveGameSprite(octopusPosition, octopus)
         moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, 1.85)
         if (sharkPosition.equals(sharkTargetWaypoint.point)) {
             let holding = sharkTargetWaypoint
-            sharkTargetWaypoint = sharkTargetWaypoint.getRandomConnection(sharkPreviousWaypoint === null ? [] : [sharkPreviousWaypoint])
+            if(playerInWater){
+                sharkTargetWaypoint = sharkTargetWaypoint.getClosestConnectionToPoint(playerPosition)   
+            } else {
+                sharkTargetWaypoint = sharkTargetWaypoint.getRandomConnection(sharkPreviousWaypoint === null ? [] : [sharkPreviousWaypoint])
+            }
+            if (sharkPosition.remainder > 0) {
+                moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, sharkPosition.remainder)
+            }
             sharkPreviousWaypoint = holding
         }
     }
-// once at waypoint determine next waypoint based on
-    // player in water or on land
     moveGameSprite(sharkPosition, shark)
     sharkPosition.remainder = 0
 })
