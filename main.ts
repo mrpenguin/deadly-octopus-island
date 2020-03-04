@@ -262,6 +262,7 @@ let waypoints: Array<HelperClasses.Waypoint> = []
 let HIT_BUFFER = 4
 let TILE_SIZE = 8
 let PLAYER_MOVE_SPEED = 40
+let SHARK_MOVE_SPEED = 1.85
 let playerPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let octopusPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let sharkPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
@@ -539,12 +540,18 @@ moveGameSprite(octopusPosition, octopus)
     } 
     
     if(sharkFollowsPlayer){
-
+        sharkTargetWaypoint = null //clear this so that the shark finds a new waypoint after leaving off following the player
+        moveTowardPoint(sharkPosition, sharkSeekPath[0].point, SHARK_MOVE_SPEED)
+        if (sharkPosition.equals(sharkTargetWaypoint.point)) {
+            if (sharkPosition.remainder > 0 && sharkSeekPath.length > 1) {
+                moveTowardPoint(sharkPosition, sharkSeekPath[1].point, sharkPosition.remainder)
+            }
+        }
     } else {
         if (sharkTargetWaypoint == null) {
             sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
         }
-        moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, 1.85)
+        moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, SHARK_MOVE_SPEED)
         if (sharkPosition.equals(sharkTargetWaypoint.point)) {
             let holding = sharkTargetWaypoint
             if(playerInWater){
