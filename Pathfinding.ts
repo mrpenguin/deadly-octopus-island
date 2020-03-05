@@ -21,7 +21,6 @@ namespace Pathfinding{
                 if (surroundingTiles[i].equalsPathPosition(targetPathPosition)) {
                     surroundingTiles[i].pathParent = shortestPathTile
                     finalPathTile = surroundingTiles[i]
-                    console.log("here")
                     break
                 } else {
                     //search open tiles

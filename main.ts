@@ -533,18 +533,18 @@ moveGameSprite(octopusPosition, octopus)
     // if shark is close target player if shark is far
     // pathfind closest waypoint
     sharkFollowsPlayer = false
-    if(playerInWater && sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 5){
+    if(playerInWater && sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 6){
         sharkTargetTile = findSharkTargetTile(playerPosition)
         sharkSeekPath = Pathfinding.seekPath(sharkPosition, playerPosition, 10)
-        sharkFollowsPlayer = sharkSeekPath.length > 0
+        sharkFollowsPlayer = sharkSeekPath.length > 1
     } 
     
     if(sharkFollowsPlayer){
         sharkTargetWaypoint = null //clear this so that the shark finds a new waypoint after leaving off following the player
-        moveTowardPoint(sharkPosition, sharkSeekPath[0].point, SHARK_MOVE_SPEED)
-        if (sharkPosition.equals(sharkTargetWaypoint.point)) {
-            if (sharkPosition.remainder > 0 && sharkSeekPath.length > 1) {
-                moveTowardPoint(sharkPosition, sharkSeekPath[1].point, sharkPosition.remainder)
+        moveTowardPoint(sharkPosition, sharkSeekPath[1].point, SHARK_MOVE_SPEED)
+        if (sharkPosition.equals(sharkSeekPath[1].point)) {
+            if (sharkPosition.remainder > 0 && sharkSeekPath.length > 2) {
+                moveTowardPoint(sharkPosition, sharkSeekPath[2].point, sharkPosition.remainder)
             }
         }
     } else {
