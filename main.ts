@@ -249,20 +249,34 @@ namespace myTiles {
         b 5 b 5 5 b 5 b
         b b b 5 5 b b b
     `
+    //% blockIdentity=images._tile
+    export const tile23 = img`
+        d d d d d d d d
+        d 4 5 4 4 5 4 d
+        d 4 5 4 4 5 4 d
+        d d d d d d d d
+        d 4 5 d d 5 4 d
+        d 4 5 4 4 5 4 d
+        d 4 5 4 4 5 4 d
+        d d d d d d d d
+    `
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.setScore(info.score() + 1)
     otherSprite.destroy()
 })
-let sharkTargetWaypoint: HelperClasses.Waypoint = null
-let sharkPreviousWaypoint: HelperClasses.Waypoint = null
-let playerInWater:boolean = false
-let sharkSeekPath: Array<HelperClasses.PathPosition> = []
+let holding:HelperClasses.Waypoint = null
+let sharkFollowsPlayer = false
+let totalGuffins = 0
 let waypoints: Array<HelperClasses.Waypoint> = []
+let sharkSeekPath: Array<HelperClasses.PathPosition> = []
+let playerInWater:boolean = false
+let sharkPreviousWaypoint: HelperClasses.Waypoint = null
+let sharkTargetWaypoint: HelperClasses.Waypoint = null
 let HIT_BUFFER = 4
 let TILE_SIZE = 8
 let PLAYER_MOVE_SPEED = 40
-let SHARK_MOVE_SPEED = 1.85
+let SHARK_MOVE_SPEED = 2.1
 let playerPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let octopusPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let sharkPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
@@ -333,7 +347,7 @@ let coin = sprites.create(img`
 controller.moveSprite(mySprite)
 scene.cameraFollowSprite(mySprite)
 tiles.setTilemap(tiles.createTilemap(
-            hex`2000200001010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010110010101010101010101010101010101010101010101010101110101010101010101010101010101010101010101010101010101010101010101010101010101010115010101010101010101010101010101010101150101010101010101010101010101011313010101010101010101010101010101010101010101010101010101010102030303030303030303030303030314010101010101010101010101010101010203030303030303030303030303031401010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101120102030304011501010101010101010101011501010101010101010101010101010203050401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102050304010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020305040101010101010101010101010101010101010101010101010101010102030304010101010101010101010101010101010101010101010101010101010205030401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102030504010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010101131301010101010101010101010101010101010101010101010101010115010101010101150101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101`,
+            hex`2000200001010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010110010101010101010101010101010101010101010101010101110101010101010101010101010101010101010101010101010101010101010101010101010101010115010101010101010101010101010101010101150101010101010101010101010101011313010101010101010101010101010101010101010101010101010101010102030303030303030303030303030314010101010101010101010101010101010203030303030303030303030303031401010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101120102030304011501010101010101010101011501010101010101010101010101010203050401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102050304010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020305040101010101010101010101010101010101010101010101010101010102030304010101010101010101010101010101010101010101010101010101010205030401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102030504010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010101131301010101010101010101010101010101131313010101010101010115010101010101150101010101010101010101010303030303010101010101010101010101010101010101010101010101010114030303030301010101010101010101010101010101010101010101010101011403031603030101010101010101010101010101010101010101010101010101140303030303010101010101010101010101010101010101010101010101010101030303030301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101`,
             img`
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -368,7 +382,7 @@ tiles.setTilemap(tiles.createTilemap(
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
             `,
-            [myTiles.tile0,myTiles.tile2,myTiles.tile3,myTiles.tile4,myTiles.tile5,myTiles.tile6,myTiles.tile7,myTiles.tile8,myTiles.tile9,myTiles.tile10,myTiles.tile11,myTiles.tile12,myTiles.tile13,myTiles.tile14,myTiles.tile15,myTiles.tile16,myTiles.tile17,myTiles.tile18,myTiles.tile19,myTiles.tile20,myTiles.tile21,myTiles.tile22],
+            [myTiles.tile0,myTiles.tile2,myTiles.tile3,myTiles.tile4,myTiles.tile5,myTiles.tile6,myTiles.tile7,myTiles.tile8,myTiles.tile9,myTiles.tile10,myTiles.tile11,myTiles.tile12,myTiles.tile13,myTiles.tile14,myTiles.tile15,myTiles.tile16,myTiles.tile17,myTiles.tile18,myTiles.tile19,myTiles.tile20,myTiles.tile21,myTiles.tile22,myTiles.tile23],
             TileScale.Eight
         ))
 let coinTiles = tiles.getTilesByType(myTiles.tile6)
@@ -376,6 +390,7 @@ coinTiles.forEach(function (value: tiles.Location, index: number) {
     let newCoin = sprites.create(coin.image, SpriteKind.Food)
     tiles.placeOnTile(newCoin, value)
     tiles.setTileAt(value, myTiles.tile4);
+    totalGuffins++
 })
 let waypointTiles = tiles.getTilesByType(myTiles.tile22)
 waypointTiles.forEach(function (value: tiles.Location, index: number) {
@@ -396,7 +411,6 @@ shark.x = sharkPosition.x = sharkSpawnTile.x
 shark.y = sharkPosition.y = sharkSpawnTile.y
 tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
 let sharkTargetTile = new HelperClasses.Point()
-let sharkFollowsPlayer = false
 function positionToTile(position: number, tileSize: number): number {
     return Math.floor(position / tileSize);
 }
@@ -520,19 +534,17 @@ playerInWater = isWaterTile(playerPosition.tile)
 // move octopus
     octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, HIT_BUFFER)
 moveGameSprite(octopusPosition, octopus)
-
-//move shark
+// move shark
     sharkFollowsPlayer = false
-    if(playerInWater && sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 10){
+    if (playerInWater && sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 10) {
         sharkTargetTile = findSharkTargetTile(playerPosition)
-        sharkSeekPath = Pathfinding.seekPath(sharkPosition, playerPosition, 10)
-        sharkFollowsPlayer = sharkSeekPath.length > 1
-    } 
-    
-    if(sharkFollowsPlayer){
-        sharkTargetWaypoint = null //clear this so that the shark finds a new waypoint after leaving off following the player
-        moveTowardPoint(sharkPosition, sharkSeekPath[1].point, SHARK_MOVE_SPEED)
-        if (sharkPosition.equals(sharkSeekPath[1].point)) {
+sharkSeekPath = Pathfinding.seekPath(sharkPosition, playerPosition, 10)
+sharkFollowsPlayer = sharkSeekPath.length > 1
+    }
+    if (sharkFollowsPlayer) {
+        sharkTargetWaypoint = null
+moveTowardPoint(sharkPosition, sharkSeekPath[1].point, SHARK_MOVE_SPEED)
+if (sharkPosition.equals(sharkSeekPath[1].point)) {
             if (sharkPosition.remainder > 0 && sharkSeekPath.length > 2) {
                 moveTowardPoint(sharkPosition, sharkSeekPath[2].point, sharkPosition.remainder)
             }
@@ -542,10 +554,10 @@ moveGameSprite(octopusPosition, octopus)
             sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
         }
         moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, SHARK_MOVE_SPEED)
-        if (sharkPosition.equals(sharkTargetWaypoint.point)) {
-            let holding = sharkTargetWaypoint
-            if(playerInWater){
-                sharkTargetWaypoint = sharkTargetWaypoint.getClosestConnectionToPoint(playerPosition)   
+if (sharkPosition.equals(sharkTargetWaypoint.point)) {
+            holding = sharkTargetWaypoint
+            if (playerInWater) {
+                sharkTargetWaypoint = sharkTargetWaypoint.getClosestConnectionToPoint(playerPosition)
             } else {
                 sharkTargetWaypoint = sharkTargetWaypoint.getRandomConnection(sharkPreviousWaypoint === null ? [] : [sharkPreviousWaypoint])
             }
@@ -556,5 +568,5 @@ moveGameSprite(octopusPosition, octopus)
         }
     }
     moveGameSprite(sharkPosition, shark)
-    sharkPosition.remainder = 0
+sharkPosition.remainder = 0
 })
