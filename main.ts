@@ -275,8 +275,8 @@ namespace myTiles {
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.setScore(info.score() + 1)
     otherSprite.destroy()
-    if(info.score() == totalGuffins){
-        let finalTargetTiles = tiles.getTilesByType(myTiles.tile23)
+    if (info.score() == totalGuffins) {
+        finalTargetTiles = tiles.getTilesByType(myTiles.tile23)
         finalTargetTiles.forEach(function (value: tiles.Location, index: number) {
             tiles.setTileAt(value, myTiles.tile24)
         })
@@ -290,6 +290,7 @@ let playerInWater:boolean = false
 let sharkSeekPath: Array<HelperClasses.PathPosition> = []
 let waypoints: Array<HelperClasses.Waypoint> = []
 let totalGuffins = 0
+let finalTargetTiles: tiles.Location[] = []
 let HIT_BUFFER = 4
 let TILE_SIZE = 8
 let PLAYER_MOVE_SPEED = 40
@@ -455,6 +456,12 @@ function isLandTile(tileImage: Image): boolean {
     }
     return false
 }
+function isWinningTile(tileImage: Image): boolean {
+    if (tileImage == myTiles.tile24) {
+        return true
+    }
+    return false
+}
 function checkLandBoundsCollision(character: Sprite, lastPosition: HelperClasses.Point): HelperClasses.Point {
     let newTile: Image = tiles.getTileAt(positionToTile(character.x, TILE_SIZE), positionToTile(character.y, TILE_SIZE))
     if (lastPosition.tile == null) {
@@ -547,7 +554,11 @@ function moveTowardPoint(position: HelperClasses.Point, point: HelperClasses.Poi
 }
 game.onUpdate(function () {
     playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
-playerInWater = isWaterTile(playerPosition.tile)
+if (isWinningTile(playerPosition.tile)) {
+        
+        game.winEffect.startScreenEffect()
+    }
+    playerInWater = isWaterTile(playerPosition.tile)
 // move octopus
     octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, HIT_BUFFER)
 moveGameSprite(octopusPosition, octopus)
