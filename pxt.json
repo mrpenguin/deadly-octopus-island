@@ -9,7 +9,8 @@
         "main.ts",
         "README.md",
         "HelperClasses.ts",
-        "Pathfinding.ts"
+        "Pathfinding.ts",
+        "StateMachine.ts"
     ],
     "testFiles": [
         "test.ts"
