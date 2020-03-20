@@ -6,6 +6,10 @@ namespace StateMachine{
         changeState(newState:string): void
     }
     export class StateMachine {
+        public onStateChange: { (currentState: string) : void}[] = []
 
+        constructor (){
+            
+        }
     }
 }
