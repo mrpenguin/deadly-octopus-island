@@ -290,11 +290,12 @@ let playerInWater:boolean = false
 let sharkSeekPath: Array<HelperClasses.PathPosition> = []
 let waypoints: Array<HelperClasses.Waypoint> = []
 let totalGuffins = 0
+let currentLevel = 0
 let finalTargetTiles: tiles.Location[] = []
-let HIT_BUFFER = 4
-let TILE_SIZE = 8
-let PLAYER_MOVE_SPEED = 40
-let SHARK_MOVE_SPEED = 2.1
+const HIT_BUFFER:number = 4
+const TILE_SIZE:number = 8
+const PLAYER_MOVE_SPEED:number = 40
+const SHARK_MOVE_SPEED:number = 2.1
 let playerPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let octopusPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let sharkPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
@@ -366,6 +367,7 @@ const STATE_LEVEL_INIT: string = "state_level_init"
 const STATE_LEVEL_PLAY: string = "state_level_play"
 const STATE_LEVEL_END: string = "state_level_end"
 const STATE_LEVEL_INTRO: string = "state_level_intro"
+const STATE_GAME_OVER: string = "state_game_over"
 controller.moveSprite(mySprite)
 scene.cameraFollowSprite(mySprite)
 let gameState:StateMachine.StateMachine = new StateMachine.StateMachine()
@@ -606,55 +608,53 @@ game.onUpdate(function () {
         break;
 
         case STATE_LEVEL_PLAY:
-
+            playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
+            playerInWater = isWaterTile(playerPosition.tile)
+            // move octopus
+            octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, HIT_BUFFER)
+            moveGameSprite(octopusPosition, octopus)
+            // move shark
+            sharkFollowsPlayer = false
+            if (playerInWater && sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 10) {
+                sharkTargetTile = findSharkTargetTile(playerPosition)
+                sharkSeekPath = Pathfinding.seekPath(sharkPosition, playerPosition, 10)
+                sharkFollowsPlayer = sharkSeekPath.length > 1
+            }
+            if (sharkFollowsPlayer) {
+                sharkTargetWaypoint = null
+                moveTowardPoint(sharkPosition, sharkSeekPath[1].point, SHARK_MOVE_SPEED)
+                if (sharkPosition.equals(sharkSeekPath[1].point)) {
+                    if (sharkPosition.remainder > 0 && sharkSeekPath.length > 2) {
+                        moveTowardPoint(sharkPosition, sharkSeekPath[2].point, sharkPosition.remainder)
+                    }
+                }
+            } else {
+                if (sharkTargetWaypoint == null) {
+                    sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
+                }
+                moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, SHARK_MOVE_SPEED)
+                if (sharkPosition.equals(sharkTargetWaypoint.point)) {
+                    waypointHolding = sharkTargetWaypoint
+                    if (playerInWater) {
+                        sharkTargetWaypoint = sharkTargetWaypoint.getClosestConnectionToPoint(playerPosition)
+                    } else {
+                        sharkTargetWaypoint = sharkTargetWaypoint.getRandomConnection(sharkPreviousWaypoint === null ? [] : [sharkPreviousWaypoint])
+                    }
+                    if (sharkPosition.remainder > 0) {
+                        moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, sharkPosition.remainder)
+                    }
+                    sharkPreviousWaypoint = waypointHolding
+                }
+            }
+            moveGameSprite(sharkPosition, shark)
+            sharkPosition.remainder = 0
+            if (isWinningTile(playerPosition.tile)) {
+                gameState.changeState(STATE_LEVEL_END)
+            }
         break;
 
         case STATE_LEVEL_END:
 
         break;
     }
-    playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
-if (isWinningTile(playerPosition.tile)) {
-        
-        game.winEffect.startScreenEffect()
-    }
-    playerInWater = isWaterTile(playerPosition.tile)
-// move octopus
-    octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, HIT_BUFFER)
-moveGameSprite(octopusPosition, octopus)
-// move shark
-    sharkFollowsPlayer = false
-    if (playerInWater && sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 10) {
-        sharkTargetTile = findSharkTargetTile(playerPosition)
-sharkSeekPath = Pathfinding.seekPath(sharkPosition, playerPosition, 10)
-sharkFollowsPlayer = sharkSeekPath.length > 1
-    }
-    if (sharkFollowsPlayer) {
-        sharkTargetWaypoint = null
-moveTowardPoint(sharkPosition, sharkSeekPath[1].point, SHARK_MOVE_SPEED)
-if (sharkPosition.equals(sharkSeekPath[1].point)) {
-            if (sharkPosition.remainder > 0 && sharkSeekPath.length > 2) {
-                moveTowardPoint(sharkPosition, sharkSeekPath[2].point, sharkPosition.remainder)
-            }
-        }
-    } else {
-        if (sharkTargetWaypoint == null) {
-            sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
-        }
-        moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, SHARK_MOVE_SPEED)
-if (sharkPosition.equals(sharkTargetWaypoint.point)) {
-            waypointHolding = sharkTargetWaypoint
-            if (playerInWater) {
-                sharkTargetWaypoint = sharkTargetWaypoint.getClosestConnectionToPoint(playerPosition)
-            } else {
-                sharkTargetWaypoint = sharkTargetWaypoint.getRandomConnection(sharkPreviousWaypoint === null ? [] : [sharkPreviousWaypoint])
-            }
-            if (sharkPosition.remainder > 0) {
-                moveTowardPoint(sharkPosition, sharkTargetWaypoint.point, sharkPosition.remainder)
-            }
-            sharkPreviousWaypoint = waypointHolding
-        }
-    }
-    moveGameSprite(sharkPosition, shark)
-sharkPosition.remainder = 0
 })
