@@ -272,16 +272,6 @@ namespace myTiles {
         d d d d d d d d
     `
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
-    info.setScore(info.score() + 1)
-    otherSprite.destroy()
-    if (info.score() == totalGuffins) {
-        finalTargetTiles = tiles.getTilesByType(myTiles.tile23)
-        finalTargetTiles.forEach(function (value: tiles.Location, index: number) {
-            tiles.setTileAt(value, myTiles.tile24)
-        })
-    }
-})
 let waypointHolding:HelperClasses.Waypoint = null
 let sharkFollowsPlayer = false
 let sharkTargetWaypoint: HelperClasses.Waypoint = null
@@ -294,7 +284,7 @@ let currentLevel = 0
 let finalTargetTiles: tiles.Location[] = []
 const HIT_BUFFER:number = 4
 const TILE_SIZE:number = 8
-const PLAYER_MOVE_SPEED:number = 40
+const PLAYER_MOVE_SPEED:number = 100
 const SHARK_MOVE_SPEED:number = 2.1
 let playerPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
 let octopusPosition: HelperClasses.Point = new HelperClasses.Point(0, 0)
@@ -363,55 +353,18 @@ let coin = sprites.create(img`
     . 4 5 5 5 5 4 .
     . . 4 4 4 4 . .
 `, SpriteKind.Food)
+let sharkTargetTile = new HelperClasses.Point()
 const STATE_LEVEL_INIT: string = "state_level_init"
 const STATE_LEVEL_PLAY: string = "state_level_play"
 const STATE_LEVEL_END: string = "state_level_end"
 const STATE_LEVEL_INTRO: string = "state_level_intro"
 const STATE_GAME_OVER: string = "state_game_over"
-controller.moveSprite(mySprite)
-scene.cameraFollowSprite(mySprite)
 let gameState:StateMachine.StateMachine = new StateMachine.StateMachine()
-gameState.addBeforeStateChange(function (newState: string, oldState: string) {
-    switch (oldState) {
-        case STATE_LEVEL_INTRO:
 
-            break;
-
-        case STATE_LEVEL_INIT:
-
-            break;
-
-        case STATE_LEVEL_PLAY:
-
-            break;
-
-        case STATE_LEVEL_END:
-
-            break;
-    }
-})
-gameState.addStateChange(function (currentState: string) {
-    switch (currentState) {
-        case STATE_LEVEL_INTRO:
-
-            break;
-
-        case STATE_LEVEL_INIT:
-
-            break;
-
-        case STATE_LEVEL_PLAY:
-
-            break;
-
-        case STATE_LEVEL_END:
-
-            break;
-    }
-})
-tiles.setTilemap(tiles.createTilemap(
-            hex`2000200001010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010110010101010101010101010101010101010101010101010101110101010101010101010101010101010101010101010101010101010101010101010101010101010115010101010101010101010101010101010101150101010101010101010101010101011313010101010101010101010101010101010101010101010101010101010102030303030303030303030303030314010101010101010101010101010101010203030303030303030303030303031401010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101120102030304011501010101010101010101011501010101010101010101010101010203050401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102050304010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020305040101010101010101010101010101010101010101010101010101010102030304010101010101010101010101010101010101010101010101010101010205030401010101010101150101010101150101010101011501010101010101020303040101010101010101010101010101010101010101010101010101010102030504010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010101131301010101010101010101010101010101131313010101010101010115010101010101150101010101150101010101010303030303010101010101010101010101010101010101010101010101010114030303030301010101010101010101010101010101010101010101010101011403031603030101010101010101010101010101010101010101010101010101140303030303010101010101010101010101010101010101010101010101010101030303030301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101011501010101010115010101010115010101010101010101010101150101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101`,
-            img`
+let levels = [
+    tiles.createTilemap(
+        hex`2000200001010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010110010101010101010101010101010101010101010101010101110101010101010101010101010101010101010101010101010101010101010101010101010101010115010101010101010101010101010101010101150101010101010101010101010101011313010101010101010101010101010101010101010101010101010101010102030303030303030303030303030314010101010101010101010101010101010203030303030303030303030303031401010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101120102030304011501010101010101010101011501010101010101010101010101010203050401010101010101010101010101010101010101010101010101010101020303040101010101010101010101010101010101010101010101010101010102050304010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020305040101010101010101010101010101010101010101010101010101010102030304010101010101010101010101010101010101010101010101010101010205030401010101010101150101010101150101010101011501010101010101020303040101010101010101010101010101010101010101010101010101010102030504010101010101010101010101010101010101010101010101010101010203030401010101010101010101010101010101010101010101010101010101020503040101010101010101010101010101010101010101010101010101010101131301010101010101010101010101010101131313010101010101010115010101010101150101010101150101010101010303030303010101010101010101010101010101010101010101010101010114030303030301010101010101010101010101010101010101010101010101011403031603030101010101010101010101010101010101010101010101010101140303030303010101010101010101010101010101010101010101010101010101030303030301010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101011501010101010115010101010115010101010101010101010101150101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101`,
+        img`
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -445,35 +398,10 @@ tiles.setTilemap(tiles.createTilemap(
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
             `,
-            [myTiles.tile0,myTiles.tile2,myTiles.tile3,myTiles.tile4,myTiles.tile5,myTiles.tile6,myTiles.tile7,myTiles.tile8,myTiles.tile9,myTiles.tile10,myTiles.tile11,myTiles.tile12,myTiles.tile13,myTiles.tile14,myTiles.tile15,myTiles.tile16,myTiles.tile17,myTiles.tile18,myTiles.tile19,myTiles.tile20,myTiles.tile21,myTiles.tile22,myTiles.tile23,myTiles.tile24],
-            TileScale.Eight
-        ))
-let coinTiles = tiles.getTilesByType(myTiles.tile6)
-coinTiles.forEach(function (value: tiles.Location, index: number) {
-    let newCoin = sprites.create(coin.image, SpriteKind.Food)
-    tiles.placeOnTile(newCoin, value)
-    tiles.setTileAt(value, myTiles.tile4);
-    totalGuffins++
-})
-let waypointTiles = tiles.getTilesByType(myTiles.tile22)
-waypointTiles.forEach(function (value: tiles.Location, index: number) {
-    tiles.setTileAt(value, myTiles.tile2)
-    waypoints.push(new HelperClasses.Waypoint(new HelperClasses.Point(value.x, value.y)))
-})
-waypoints = Pathfinding.connectWaypoints(waypoints)
-let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
-mySprite.x = playerPosition.x = playerSpawnTile.x
-mySprite.y = playerPosition.y = playerSpawnTile.y
-tiles.setTileAt(playerSpawnTile, myTiles.tile2)
-let octopusSpawnTile = tiles.getTilesByType(myTiles.tile18)[0]
-octopus.x = octopusPosition.x = octopusSpawnTile.x
-octopus.y = octopusPosition.y = octopusSpawnTile.y
-tiles.setTileAt(octopusSpawnTile, myTiles.tile2)
-let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
-shark.x = sharkPosition.x = sharkSpawnTile.x
-shark.y = sharkPosition.y = sharkSpawnTile.y
-tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
-let sharkTargetTile = new HelperClasses.Point()
+        [myTiles.tile0, myTiles.tile2, myTiles.tile3, myTiles.tile4, myTiles.tile5, myTiles.tile6, myTiles.tile7, myTiles.tile8, myTiles.tile9, myTiles.tile10, myTiles.tile11, myTiles.tile12, myTiles.tile13, myTiles.tile14, myTiles.tile15, myTiles.tile16, myTiles.tile17, myTiles.tile18, myTiles.tile19, myTiles.tile20, myTiles.tile21, myTiles.tile22, myTiles.tile23, myTiles.tile24],
+        TileScale.Eight
+    )
+]
 function positionToTile(position: number, tileSize: number): number {
     return Math.floor(position / tileSize);
 }
@@ -597,6 +525,55 @@ function moveTowardPoint(position: HelperClasses.Point, point: HelperClasses.Poi
     }
     return position
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+    info.setScore(info.score() + 1)
+    otherSprite.destroy()
+    if (info.score() > totalGuffins) {
+        finalTargetTiles = tiles.getTilesByType(myTiles.tile23)
+        finalTargetTiles.forEach(function (value: tiles.Location, index: number) {
+            tiles.setTileAt(value, myTiles.tile24)
+        })
+    }
+})
+gameState.addBeforeStateChange(function (newState: string, oldState: string) {
+    switch (oldState) {
+        case STATE_LEVEL_INTRO:
+
+            break;
+
+        case STATE_LEVEL_INIT:
+
+            break;
+
+        case STATE_LEVEL_PLAY:
+            controller.moveSprite(mySprite, 0, 0)
+            break;
+
+        case STATE_LEVEL_END:
+
+            break;
+    }
+})
+gameState.addStateChange(function (currentState: string) {
+    switch (currentState) {
+        case STATE_LEVEL_INTRO:
+
+            break;
+
+        case STATE_LEVEL_INIT:
+            tiles.setTilemap(levels[currentLevel])
+            break;
+
+        case STATE_LEVEL_PLAY:
+            controller.moveSprite(mySprite, PLAYER_MOVE_SPEED, PLAYER_MOVE_SPEED)
+            scene.cameraFollowSprite(mySprite)
+            break;
+
+        case STATE_LEVEL_END:
+
+            break;
+    }
+})
 game.onUpdate(function () {
     switch(gameState.getState()){
         case STATE_LEVEL_INTRO:
@@ -604,7 +581,32 @@ game.onUpdate(function () {
         break;
 
         case STATE_LEVEL_INIT:
-
+            let coinTiles = tiles.getTilesByType(myTiles.tile6)
+            coinTiles.forEach(function (value: tiles.Location, index: number) {
+                let newCoin = sprites.create(coin.image, SpriteKind.Food)
+                tiles.placeOnTile(newCoin, value)
+                tiles.setTileAt(value, myTiles.tile4);
+                totalGuffins++
+            })
+            let waypointTiles = tiles.getTilesByType(myTiles.tile22)
+            waypointTiles.forEach(function (value: tiles.Location, index: number) {
+                tiles.setTileAt(value, myTiles.tile2)
+                waypoints.push(new HelperClasses.Waypoint(new HelperClasses.Point(value.x, value.y)))
+            })
+            waypoints = Pathfinding.connectWaypoints(waypoints)
+            let playerSpawnTile = tiles.getTilesByType(myTiles.tile17)[0]
+            mySprite.x = playerPosition.x = playerSpawnTile.x
+            mySprite.y = playerPosition.y = playerSpawnTile.y
+            tiles.setTileAt(playerSpawnTile, myTiles.tile2)
+            let octopusSpawnTile = tiles.getTilesByType(myTiles.tile18)[0]
+            octopus.x = octopusPosition.x = octopusSpawnTile.x
+            octopus.y = octopusPosition.y = octopusSpawnTile.y
+            tiles.setTileAt(octopusSpawnTile, myTiles.tile2)
+            let sharkSpawnTile = tiles.getTilesByType(myTiles.tile19)[0]
+            shark.x = sharkPosition.x = sharkSpawnTile.x
+            shark.y = sharkPosition.y = sharkSpawnTile.y
+            tiles.setTileAt(sharkSpawnTile, myTiles.tile2)
+            gameState.changeState(STATE_LEVEL_PLAY)
         break;
 
         case STATE_LEVEL_PLAY:
@@ -649,6 +651,7 @@ game.onUpdate(function () {
             moveGameSprite(sharkPosition, shark)
             sharkPosition.remainder = 0
             if (isWinningTile(playerPosition.tile)) {
+                currentLevel++
                 gameState.changeState(STATE_LEVEL_END)
             }
         break;
@@ -658,3 +661,6 @@ game.onUpdate(function () {
         break;
     }
 })
+
+
+gameState.changeState(STATE_LEVEL_INIT);
