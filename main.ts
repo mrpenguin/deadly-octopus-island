@@ -573,6 +573,7 @@ gameState.addStateChange(function (currentState: string) {
 
         case STATE_LEVEL_INIT:
             tiles.setTilemap(levels[currentLevel])
+            sharkTargetWaypoint = null
             break;
 
         case STATE_LEVEL_PLAY:
