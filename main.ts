@@ -281,6 +281,7 @@ let sharkSeekPath: Array<HelperClasses.PathPosition> = []
 let waypoints: Array<HelperClasses.Waypoint> = []
 let totalGuffins = 0
 let currentLevel = 0
+let playerLives = 3
 let finalTargetTiles: tiles.Location[] = []
 const HIT_BUFFER:number = 4
 const TILE_SIZE:number = 8
@@ -353,10 +354,12 @@ let coin = sprites.create(img`
     . 4 5 5 5 5 4 .
     . . 4 4 4 4 . .
 `, SpriteKind.Food)
-coin.setPosition(-10, -10)
+coin.setPosition(-10, -10) //hide the initial coin where it can't be touched
 let sharkTargetTile = new HelperClasses.Point()
 const STATE_LEVEL_INIT: string = "state_level_init"
+const STATE_LEVEL_RESTART: string = "state_level_restart"
 const STATE_LEVEL_PLAY: string = "state_level_play"
+const STATE_LEVEL_PLAYER_DEAD: string = "state_level_player_dead"
 const STATE_LEVEL_END: string = "state_level_end"
 const STATE_LEVEL_INTRO: string = "state_level_intro"
 const STATE_GAME_OVER: string = "state_game_over"
@@ -451,6 +454,16 @@ function isWinningTile(tileImage: Image): boolean {
         return true
     }
     return false
+}
+function isPlayerDead(player:Sprite, shark:Sprite, octopus:Sprite):boolean{
+
+    return false
+}
+function spritesOverlappingWithBuffer(baseSprite:Sprite, overlapSprite:Sprite, buffer:number){
+    let left = baseSprite.x - baseSprite.width()/2
+    let right = baseSprite.x + baseSprite.width()/2
+    let overlapLeft = overlapSprite.x - baseSprite.width()/2 + buffer
+    let overlapRight = overlapSprite.y + baseSprite.width() - buffer
 }
 function checkLandBoundsCollision(character: Sprite, lastPosition: HelperClasses.Point): HelperClasses.Point {
     let newTile: Image = tiles.getTileAt(positionToTile(character.x, TILE_SIZE), positionToTile(character.y, TILE_SIZE))
