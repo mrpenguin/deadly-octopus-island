@@ -366,39 +366,39 @@ const STATE_GAME_OVER: string = "state_game_over"
 let gameState:StateMachine.StateMachine = new StateMachine.StateMachine()
 
 let level_32_32 = img`
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-        `
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+`
     let levelTiles = [myTiles.tile0, myTiles.tile2, myTiles.tile3, myTiles.tile4, myTiles.tile5, myTiles.tile6, myTiles.tile7, myTiles.tile8, myTiles.tile9, myTiles.tile10, myTiles.tile11, myTiles.tile12, myTiles.tile13, myTiles.tile14, myTiles.tile15, myTiles.tile16, myTiles.tile17, myTiles.tile18, myTiles.tile19, myTiles.tile20, myTiles.tile21, myTiles.tile22, myTiles.tile23, myTiles.tile24]
 
 let levels = [
@@ -456,14 +456,29 @@ function isWinningTile(tileImage: Image): boolean {
     return false
 }
 function isPlayerDead(player:Sprite, shark:Sprite, octopus:Sprite):boolean{
-
+    if(spritesOverlappingWithBuffer(player, shark, 1)){
+        return true
+    }
+    if(spritesOverlappingWithBuffer(player, octopus, 5)){
+        return true
+    }
     return false
 }
-function spritesOverlappingWithBuffer(baseSprite:Sprite, overlapSprite:Sprite, buffer:number){
+function spritesOverlappingWithBuffer(baseSprite:Sprite, overlapSprite:Sprite, buffer:number):boolean {
     let left = baseSprite.x - baseSprite.width()/2
     let right = baseSprite.x + baseSprite.width()/2
-    let overlapLeft = overlapSprite.x - baseSprite.width()/2 + buffer
-    let overlapRight = overlapSprite.y + baseSprite.width() - buffer
+    let overlapLeft = overlapSprite.x - overlapSprite.width()/2 + buffer
+    let overlapRight = overlapSprite.x + overlapSprite.width()/2 - buffer
+    if(left >= overlapLeft && left <= overlapRight || right <= overlapRight && right > overlapLeft ){
+        let top = baseSprite.y - baseSprite.height()/2
+        let bottom = baseSprite.y + baseSprite.height()/2
+        let overlapTop = overlapSprite.y - overlapSprite.height()/2 + buffer
+        let overlapBottom = overlapSprite.y + overlapSprite.height()/2 - buffer
+        if(top >= overlapTop && top <= overlapBottom || bottom >= overlapTop && bottom <= overlapBottom){
+            return true
+        }
+    }
+    return false
 }
 function checkLandBoundsCollision(character: Sprite, lastPosition: HelperClasses.Point): HelperClasses.Point {
     let newTile: Image = tiles.getTileAt(positionToTile(character.x, TILE_SIZE), positionToTile(character.y, TILE_SIZE))
@@ -679,6 +694,10 @@ game.onUpdate(function () {
             }
             moveGameSprite(sharkPosition, shark)
             sharkPosition.remainder = 0
+            if(isPlayerDead(mySprite, shark, octopus)){
+                console.log("here")
+                gameState.changeState(STATE_LEVEL_PLAYER_DEAD)
+            }
             if (isWinningTile(playerPosition.tile)) {
                 currentLevel++
                 gameState.changeState(STATE_LEVEL_END)
