@@ -406,6 +406,7 @@ let titleScreen = img`
     1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     `
+
 let waypointHolding:HelperClasses.Waypoint = null
 let sharkFollowsPlayer = false
 let sharkTargetWaypoint: HelperClasses.Waypoint = null
@@ -488,9 +489,6 @@ let coin = sprites.create(img`
     . 4 5 5 5 5 4 .
     . . 4 4 4 4 . .
 `, SpriteKind.Food)
-let narrator = sprites.create(img`
-. 
-`, SpriteKind.create())
 coin.setPosition(-10, -10) //hide the initial coin where it can't be touched
 let sharkTargetTile = new HelperClasses.Point()
 const STATE_LEVEL_INIT: string = "state_level_init"
@@ -747,13 +745,11 @@ gameState.addStateChange(function (currentState: string) {
             mySprite.setPosition(-100, -100)
             scene.setBackgroundImage(titleScreen)
             
-            narrator.x = 30
-            narrator.y = 50
-            narrator.say("test")
+            scene.backgroundImage().print("test", 0, 0, 15)
+            scene.backgroundImage().print("other test", 0, 30, 15)
             break;
         
         case STATE_LEVEL_INTRO:
-
             break;
 
         case STATE_LEVEL_INIT:
@@ -872,5 +868,5 @@ game.onUpdate(function () {
     }
 })
 
-
+music.setVolume(20)
 gameState.changeState(STATE_TITLE);
