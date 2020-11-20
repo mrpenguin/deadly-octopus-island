@@ -539,7 +539,7 @@ let playerInWater:boolean = false
 let sharkSeekPath: Array<HelperClasses.PathPosition> = []
 let waypoints: Array<HelperClasses.Waypoint> = []
 let totalGuffins = 0
-let currentLevel = 0
+let currentLevel = 1
 let playerLives = 3
 let timer = 0
 let finalTargetTiles: tiles.Location[] = []
@@ -768,6 +768,12 @@ function checkLandBoundsCollision(character: Sprite, lastPosition: HelperClasses
     lastPosition.tile = newTile
     return lastPosition
 }
+function updatePositionTile(position: HelperClasses.Point){
+    let newTile: Image = tiles.getTileAt(positionToTile(position.x, TILE_SIZE), positionToTile(position.y, TILE_SIZE))
+    if (position.tile == null) {
+        position.tile = newTile
+    }
+}
 function findOctopusMovePosition(octopusPosition: HelperClasses.Point, playerPosition: HelperClasses.Point, buffer: number): HelperClasses.Point {
     let moveLeft: boolean = playerPosition.x < octopusPosition.x - buffer
     let moveRight: boolean = playerPosition.x > octopusPosition.x + buffer
@@ -952,6 +958,7 @@ game.onUpdate(function () {
 
         case STATE_LEVEL_PLAY:
             playerPosition = checkLandBoundsCollision(mySprite, playerPosition)
+            updatePositionTile(sharkPosition)
             playerInWater = isWaterTile(playerPosition.tile)
             // move octopus
             octopusPosition = findOctopusMovePosition(octopusPosition, playerPosition, HIT_BUFFER)
@@ -967,6 +974,7 @@ game.onUpdate(function () {
                 sharkFollowsPlayer = false; //this is a failsafe because sometimes the shark will start to follow the player onto land
             }
             if (sharkFollowsPlayer) {
+                console.log("following player")
                 sharkTargetWaypoint = null
                 moveTowardPoint(sharkPosition, sharkSeekPath[1].point, SHARK_MOVE_SPEED)
                 if (sharkPosition.equals(sharkSeekPath[1].point)) {

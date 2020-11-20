@@ -86,5 +86,11 @@ namespace HelperClasses{
         findTotalDistance(): number {
             return this.distanceFromTarget + this.distanceFromParent
         }
+        setPathParent(parent:PathPosition, targetPosition:Point):PathPosition{
+            this.pathParent = parent
+            this.distanceFromParent = parent.point.calculateDistance(this.point)
+            this.distanceFromTarget = targetPosition.calculateDistance(this.point)
+            return this
+        }
     }
 }

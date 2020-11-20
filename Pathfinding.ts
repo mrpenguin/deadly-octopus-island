@@ -19,7 +19,7 @@ namespace Pathfinding{
             for (i = 0; i < surroundingTiles.length; i++) {
                 isValidTile = true
                 if (surroundingTiles[i].equalsPathPosition(targetPathPosition)) {
-                    surroundingTiles[i].pathParent = shortestPathTile
+                    surroundingTiles[i].setPathParent(shortestPathTile, targetTile)
                     finalPathTile = surroundingTiles[i]
                     break
                 } else {
@@ -54,7 +54,7 @@ namespace Pathfinding{
                         continue
                     }
 
-                    surroundingTiles[i].pathParent = shortestPathTile
+                    surroundingTiles[i].setPathParent(shortestPathTile, targetTile)
                     openTiles.push(surroundingTiles[i])
                 }
                 if (finalPathTile != null) {
