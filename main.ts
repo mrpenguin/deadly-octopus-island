@@ -539,8 +539,8 @@ let playerInWater:boolean = false
 let sharkSeekPath: Array<HelperClasses.PathPosition> = []
 let waypoints: Array<HelperClasses.Waypoint> = []
 let totalGuffins = 0
-let currentLevel = 1
-let playerLives = 3
+let currentLevel = 0
+let playerDeaths = 0
 let timer = 0
 let finalTargetTiles: tiles.Location[] = []
 const HIT_BUFFER:number = 4
@@ -669,6 +669,12 @@ let blankLevel = tiles.createTilemap(
         levelTiles,
         TileScale.Eight
     ) 
+let levelTarget = tiles.createTilemap(
+    hex`2000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000`,
+    level_32_32,
+    levelTiles,
+    TileScale.Eight
+)
 
 let levels = [
     tiles.createTilemap(
@@ -748,6 +754,16 @@ function spritesOverlappingWithBuffer(baseSprite:Sprite, overlapSprite:Sprite, b
         }
     }
     return false
+}
+function copyTileMap(baseTilemap:tiles.TileMapData, targetTilemap:tiles.TileMapData):tiles.TileMapData{
+    let i = 0
+    let j = 0
+    for(i = 0; i < baseTilemap.width; i++){
+        for(j = 0; j < baseTilemap.height; j++){
+            targetTilemap.setTile(i, j, baseTilemap.getTile(i, j))
+        }
+    }
+    return targetTilemap
 }
 function checkLandBoundsCollision(character: Sprite, lastPosition: HelperClasses.Point): HelperClasses.Point {
     let newTile: Image = tiles.getTileAt(positionToTile(character.x, TILE_SIZE), positionToTile(character.y, TILE_SIZE))
@@ -843,6 +859,11 @@ function moveTowardPoint(position: HelperClasses.Point, point: HelperClasses.Poi
     }
     return position
 }
+function moveCharactersOffScreen(){
+    octopus.setPosition(-100, -100)
+    shark.setPosition(-100, -100)
+    mySprite.setPosition(-100, -100)
+}
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
     info.setScore(info.score() + 1)
     otherSprite.destroy()
@@ -869,6 +890,7 @@ gameState.addBeforeStateChange(function (newState: string, oldState: string) {
 
         case STATE_LEVEL_PLAY:
             controller.moveSprite(mySprite, 0, 0)
+
             break;
 
         case STATE_LEVEL_END:
@@ -879,23 +901,22 @@ gameState.addBeforeStateChange(function (newState: string, oldState: string) {
 gameState.addStateChange(function (currentState: string) {
     switch (currentState) {
         case STATE_TITLE:
-            octopus.setPosition(-100, -100)
-            shark.setPosition(-100, -100)
-            mySprite.setPosition(-100, -100)
+            moveCharactersOffScreen()
             scene.setBackgroundImage(titleScreen)
             break;
         
         case STATE_LEVEL_INTRO:
+            moveCharactersOffScreen()
             blankBackground.fill(0)
             scene.setBackgroundImage(blankBackground)
             scene.setTileMapLevel(blankLevel)
             scene.backgroundImage().printCenter("Level " + (currentLevel + 1), 30, 15)
-            scene.backgroundImage().printCenter("Lives " + playerLives, 50, 15)
+            scene.backgroundImage().printCenter("You have perished " + playerDeaths + " times.", 50, 15)
             timer = LEVEL_INTRO_DURATION
             break;
 
         case STATE_LEVEL_INIT:
-            tiles.setTilemap(levels[currentLevel])
+            tiles.setTilemap(copyTileMap(levels[currentLevel], levelTarget))
             sharkTargetWaypoint = null
             break;
 
@@ -907,6 +928,11 @@ gameState.addStateChange(function (currentState: string) {
         case STATE_LEVEL_END:
 
             break;
+
+        case STATE_LEVEL_PLAYER_DEAD:
+            playerDeaths++
+            timer = LEVEL_INTRO_DURATION
+            break
     }
 })
 game.onUpdate(function () {
@@ -971,7 +997,6 @@ game.onUpdate(function () {
                 sharkFollowsPlayer = sharkSeekPath.length > 1
             }
             if (sharkFollowsPlayer) {
-                console.log("following player")
                 sharkTargetWaypoint = null
                 moveTowardPoint(sharkPosition, sharkSeekPath[1].point, SHARK_MOVE_SPEED)
                 if (sharkPosition.equals(sharkSeekPath[1].point)) {
@@ -980,7 +1005,6 @@ game.onUpdate(function () {
                     }
                 }
             } else {
-                console.log("not following player")
                 if (sharkTargetWaypoint == null) {
                     sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
                 }
@@ -1010,8 +1034,15 @@ game.onUpdate(function () {
         break;
 
         case STATE_LEVEL_END:
-                gameState.changeState(STATE_LEVEL_INTRO)
+            gameState.changeState(STATE_LEVEL_INTRO)
         break;
+
+        case STATE_LEVEL_PLAYER_DEAD:
+            timer -= 1
+            if(timer <= 0){
+                gameState.changeState(STATE_LEVEL_INTRO)
+            }
+            break
     }
 })
 
