@@ -48,7 +48,7 @@ namespace Pathfinding{
                     }
 
                     //search map tile
-                    surroundingTiles[i].point.tile = tiles.getTileAt(surroundingTiles[i].point.x, surroundingTiles[i].point.y)
+                    surroundingTiles[i].point.tile = tiles.getTileAt(positionToTile(surroundingTiles[i].point.x, TILE_SIZE), positionToTile(surroundingTiles[i].point.y, TILE_SIZE))
                     if (isLandTile(surroundingTiles[i].point.tile)) {
                         closedTiles.push(surroundingTiles[i])
                         continue

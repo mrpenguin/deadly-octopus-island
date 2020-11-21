@@ -965,13 +965,10 @@ game.onUpdate(function () {
             moveGameSprite(octopusPosition, octopus)
             // move shark
             sharkFollowsPlayer = false
-            if (playerInWater && sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 10) {
+            if (playerInWater && isWaterTile(sharkPosition.tile) && sharkPosition.calculateDistance(playerPosition) <= TILE_SIZE * 5) {
                 sharkTargetTile = findSharkTargetTile(playerPosition)
-                sharkSeekPath = Pathfinding.seekPath(sharkPosition, playerPosition, 10)
+                sharkSeekPath = Pathfinding.seekPath(sharkPosition, playerPosition, 5)
                 sharkFollowsPlayer = sharkSeekPath.length > 1
-            }
-            if(!isWaterTile(sharkPosition.tile)){
-                sharkFollowsPlayer = false; //this is a failsafe because sometimes the shark will start to follow the player onto land
             }
             if (sharkFollowsPlayer) {
                 console.log("following player")
@@ -983,6 +980,7 @@ game.onUpdate(function () {
                     }
                 }
             } else {
+                console.log("not following player")
                 if (sharkTargetWaypoint == null) {
                     sharkTargetWaypoint = Pathfinding.getClosestWaypoint(sharkPosition, waypoints)
                 }
